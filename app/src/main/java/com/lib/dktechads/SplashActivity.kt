@@ -47,12 +47,11 @@ class SplashActivity : AppCompatActivity() {
                             override fun onAdRevenuePaid(ad: MaxAd?) {
                             }
                         })
-                        Utils.getInstance().addActivity(this@SplashActivity, MainActivity::class.java)
-
+                        Utils.getInstance().replaceActivity(this@SplashActivity, MainActivity::class.java)
                     }
                 })
         }else{
-            Utils.getInstance().addActivity(this@SplashActivity, MainActivity::class.java)
+            Utils.getInstance().replaceActivity(this@SplashActivity, MainActivity::class.java)
 
         }
     }

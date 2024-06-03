@@ -19,10 +19,6 @@ import com.google.android.gms.ads.nativead.NativeAd
 import com.lib.dktechads.R
 
 object AdsManagerAdmod {
-    var interAds1: InterstitialAd? = null
-    val mutable_inter1: MutableLiveData<InterstitialAd> = MutableLiveData()
-    var check_inter1 = false
-
     var nativeHolder = NativeHolderAdmob("ca-app-pub-3940256099942544/2247696110")
     var interholder = InterHolderAdmob("ca-app-pub-3940256099942544/1033173712")
 

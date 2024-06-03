@@ -24,9 +24,6 @@ import com.applovin.mediation.nativeAds.MaxNativeAdView
 
 
 object AdsManager {
-    var inter: MaxInterstitialAd?=null
-    val mutable_inter: MutableLiveData<MaxInterstitialAd> = MutableLiveData()
-    var check_inter = false
     var interHolder = InterHolder("134656413e36e374")
     var nativeHolder = NativeHolder("0f688c4e22b9688b")
     var banner = "f443c90308f39f17"
@@ -111,38 +108,6 @@ object AdsManager {
     var native: MaxAd? = null
     var isLoad = false
     var native_mutable: MutableLiveData<MaxAd> = MutableLiveData()
-
-    fun loadNativeAds(activity: Activity, idAd: String) {
-        isLoad = true
-        nativeAdLoader = MaxNativeAdLoader(idAd, activity)
-        nativeAdLoader?.setNativeAdListener(object : MaxNativeAdListener() {
-            override fun onNativeAdLoaded(nativeAdView: MaxNativeAdView?, ad: MaxAd) {
-                // Cleanup any pre-existing native ad to prevent memory leaks.
-                if (native != null) {
-                    nativeAdLoader?.destroy(native)
-                }
-                isLoad = false
-                // Save ad to be rendered later.
-                native = ad
-                native_mutable.value = ad
-                Toast.makeText(activity,"Loaded", Toast.LENGTH_SHORT).show()
-            }
-
-            override fun onNativeAdLoadFailed(adUnitId: String, error: MaxError) {
-                isLoad = false
-                native_mutable.value = null
-                Toast.makeText(activity,"Failed",Toast.LENGTH_SHORT).show()
-            }
-
-            override fun onNativeAdClicked(ad: MaxAd) {
-            }
-
-            override fun onNativeAdExpired(p0: MaxAd) {
-
-            }
-        })
-        nativeAdLoader?.loadAd()
-    }
 
     fun loadAndShowIntersial(activity: Activity, idAd: String,adsOnClick: AdsOnClick){
         ApplovinUtil.loadAndShowInterstitialsWithDialogCheckTime(activity as AppCompatActivity,idAd,1500, object :
