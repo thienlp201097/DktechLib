@@ -76,10 +76,6 @@ object AdsManagerAdmod {
                     Utils.getInstance().showMessenger(context, "onAdFail")
                 }
 
-                override fun onPaid(adValue: AdValue?, adsId: String?) {
-                    Utils.getInstance().showMessenger(context, adValue.toString())
-                }
-
                 override fun onEventClickAdClosed() {
                     interHolder.inter = null
                     loadInter(context,interHolder)
@@ -106,9 +102,6 @@ object AdsManagerAdmod {
 
                 override fun onAdFail(error: String?) {
                 }
-
-                override fun onAdPaid(adValue: AdValue?, adUnitAds: String?) {
-                }
             })
     }
 
@@ -120,10 +113,6 @@ object AdsManagerAdmod {
         AdmobUtils.showNativeAdsWithLayout(activity, holder, viewGroup, R.layout.ad_unified_medium, GoogleENative.UNIFIED_MEDIUM, object : AdmobUtils.AdsNativeCallBackAdmod {
             override fun NativeLoaded() {
                 Utils.getInstance().showMessenger(activity, "onNativeShow")
-            }
-
-            override fun onPaidNative(adValue: AdValue, adUnitAds: String) {
-
             }
 
             override fun NativeFailed(massage: String) {

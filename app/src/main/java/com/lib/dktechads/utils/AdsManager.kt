@@ -129,9 +129,6 @@ object AdsManager {
                 AppOpenManager.getInstance().isAppResumeEnabled = false
             }
 
-            override fun onAdRevenuePaid(ad: MaxAd?) {
-
-            }
         })
 
     }

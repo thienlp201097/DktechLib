@@ -29,12 +29,9 @@ object AdjustUtils {
         val adjustAdRevenue = AdjustAdRevenue(AdjustConfig.AD_REVENUE_APPLOVIN_MAX)
         adjustAdRevenue.setRevenue(ad.revenue, "USD")
         adjustAdRevenue.setAdRevenueNetwork(ad.networkName)
-        Log.d("==postRevenueAdjustMax==", "postRevenueAdjustMax: ${ad.networkName}")
         if (ad.networkName == "Google AdMob" || ad.networkName == "Google Ad Manager"){
-            Log.d("==postRevenueAdjustMax==", " ${ad.networkName} no post revenue")
             return
         }
-        Log.d("==postRevenueAdjustMax==", " ${ad.networkName} post revenue")
         adjustAdRevenue.setAdRevenueUnit(ad.adUnitId)
         adjustAdRevenue.setAdRevenuePlacement(ad.placement)
         Adjust.trackAdRevenue(adjustAdRevenue)

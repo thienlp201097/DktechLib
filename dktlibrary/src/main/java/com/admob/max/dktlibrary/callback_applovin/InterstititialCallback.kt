@@ -7,6 +7,5 @@ interface InterstititialCallback {
     fun onInterstitialClosed()
     fun onInterstitialLoadFail(error:String)
     fun onInterstitialShowSucceed()
-    fun onAdRevenuePaid(ad: MaxAd?)
 
 }

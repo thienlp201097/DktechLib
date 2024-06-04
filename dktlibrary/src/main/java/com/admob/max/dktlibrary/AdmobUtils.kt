@@ -451,7 +451,6 @@ object AdmobUtils {
     interface AdsNativeCallBackAdmod {
         fun NativeLoaded()
         fun NativeFailed(massage : String)
-        fun onPaidNative(adValue : AdValue, adUnitAds : String)
     }
 
     @JvmStatic
@@ -1264,7 +1263,10 @@ object AdmobUtils {
                         mInterstitialAd = interstitialAd
                         if (mInterstitialAd != null) {
                             mInterstitialAd!!.onPaidEventListener =
-                                OnPaidEventListener { adValue: AdValue? -> adCallback.onPaid(adValue,mInterstitialAd?.adUnitId) }
+                                OnPaidEventListener { adValue: AdValue? -> adValue?.let {
+                                    AdjustUtils.postRevenueAdjust(
+                                        it, mInterstitialAd!!.adUnitId)
+                                } }
                             mInterstitialAd!!.fullScreenContentCallback =
                                 object : FullScreenContentCallback() {
                                     override fun onAdFailedToShowFullScreenContent(adError: AdError) {
@@ -1439,6 +1441,7 @@ object AdmobUtils {
         builder.forNativeAd { nativeAd ->
             nativeAd.setOnPaidEventListener { adValue: AdValue? ->
                 adValue?.let { AdjustUtils.postRevenueAdjust(it, adUnit = id) }}
+            listener.onLoaded(nativeAd)
             populateNativeAdView(nativeAd,adView.findViewById(R.id.native_ad_view))
             viewGroup.removeAllViews()
             shimmerFrameLayout?.stopShimmer()
@@ -1595,6 +1598,7 @@ object AdmobUtils {
             .build()
         builder.withNativeAdOptions(adOptions)
         builder.forNativeAd { nativeAd ->
+            listener.onLoaded(nativeAd)
             nativeAd.setOnPaidEventListener { adValue: AdValue? ->
                 adValue?.let {
                     AdjustUtils.postRevenueAdjust(

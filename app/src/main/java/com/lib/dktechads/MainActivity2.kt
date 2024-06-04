@@ -36,8 +36,6 @@ class MainActivity2 : AppCompatActivity() {
 
                     }
 
-                    override fun onAdRevenuePaid(ad: MaxAd?) {
-                    }
                 })
         }
     }
