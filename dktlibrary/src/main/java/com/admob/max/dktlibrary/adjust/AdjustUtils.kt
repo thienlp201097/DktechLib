@@ -26,15 +26,15 @@ object AdjustUtils {
     }
 
     fun postRevenueAdjustMax(ad : MaxAd){
-        val adjustAdRevenue = AdjustAdRevenue(AdjustConfig.AD_REVENUE_APPLOVIN_MAX)
-        adjustAdRevenue.setRevenue(ad.revenue, "USD")
-        adjustAdRevenue.setAdRevenueNetwork(ad.networkName)
-        if (ad.networkName == "Google AdMob" || ad.networkName == "Google Ad Manager"){
-            return
-        }
-        adjustAdRevenue.setAdRevenueUnit(ad.adUnitId)
-        adjustAdRevenue.setAdRevenuePlacement(ad.placement)
-        Adjust.trackAdRevenue(adjustAdRevenue)
+//        val adjustAdRevenue = AdjustAdRevenue(AdjustConfig.AD_REVENUE_APPLOVIN_MAX)
+//        adjustAdRevenue.setRevenue(ad.revenue, "USD")
+//        adjustAdRevenue.setAdRevenueNetwork(ad.networkName)
+//        if (ad.networkName == "Google AdMob" || ad.networkName == "Google Ad Manager"){
+//            return
+//        }
+//        adjustAdRevenue.setAdRevenueUnit(ad.adUnitId)
+//        adjustAdRevenue.setAdRevenuePlacement(ad.placement)
+//        Adjust.trackAdRevenue(adjustAdRevenue)
     }
 
     fun postRevenueAdjust(ad: AdValue, adUnit: String?) {
