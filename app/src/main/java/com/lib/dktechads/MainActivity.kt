@@ -166,8 +166,6 @@ class MainActivity : AppCompatActivity() {
                     Toast.makeText(this@MainActivity,"Failed", Toast.LENGTH_SHORT).show()
                 }
 
-                override fun onAdRevenuePaid(ad: MaxAd?) {
-                }
             })
         }
 
@@ -185,10 +183,6 @@ class MainActivity : AppCompatActivity() {
                 override fun onAdFail(error: String) {
                     Toast.makeText(this@MainActivity,"Show failed", Toast.LENGTH_SHORT).show()
                 }
-
-                override fun onAdRevenuePaid(ad: MaxAd?) {
-                }
-
             })
         }
         binding.loadBanner.setOnClickListener {
@@ -215,9 +209,6 @@ class MainActivity : AppCompatActivity() {
                 }
 
                 override fun onBannerShowSucceed() {
-                }
-
-                override fun onAdRevenuePaid(ad: MaxAd?) {
                 }
             })
         }
@@ -283,10 +274,6 @@ class MainActivity : AppCompatActivity() {
             override fun onAdFail(error: String) {
                 Toast.makeText(this@MainActivity,"Show failed", Toast.LENGTH_SHORT).show()
             }
-
-            override fun onAdRevenuePaid(ad: MaxAd?) {
-            }
-
         })
     }
 

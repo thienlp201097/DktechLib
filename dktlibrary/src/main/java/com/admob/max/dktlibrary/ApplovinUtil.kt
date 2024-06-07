@@ -960,7 +960,9 @@ object ApplovinUtil : LifecycleObserver {
             callback.onInterstitialLoadFail("\"isNetworkConnected\"")
             return
         }
-        interHolder.inter?.setRevenueListener { ad -> AdjustUtils.postRevenueAdjustMax(ad) }
+        interHolder.inter?.setRevenueListener { ad ->
+            AdjustUtils.postRevenueAdjustMax(ad)
+        }
 
         if (!interHolder.check) {
             interHolder.mutable.removeObservers(activity as LifecycleOwner)

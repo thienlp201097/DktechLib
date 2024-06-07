@@ -184,7 +184,7 @@ object AdmobUtils {
         shimmerFrameLayout = tagView.findViewById(R.id.shimmer_view_container)
         shimmerFrameLayout?.startShimmer()
         mAdView.onPaidEventListener =
-            OnPaidEventListener { adValue -> bannerAdCallback.onPaid(adValue, mAdView) }
+            OnPaidEventListener { adValue -> AdjustUtils.postRevenueAdjust(adValue,mAdView.adUnitId) }
         mAdView.adListener = object : AdListener() {
             override fun onAdLoaded() {
                 shimmerFrameLayout?.stopShimmer()
@@ -256,7 +256,7 @@ object AdmobUtils {
         banner.mAdView?.adListener = object : AdListener() {
             override fun onAdLoaded() {
                 banner.mAdView?.onPaidEventListener =
-                    OnPaidEventListener { adValue -> callback.onAdPaid(adValue, banner.mAdView!!) }
+                    OnPaidEventListener { adValue -> AdjustUtils.postRevenueAdjust(adValue,banner.mAdView?.adUnitId) }
                 shimmerFrameLayout?.stopShimmer()
                 viewGroup.removeView(tagView)
                 callback.onBannerAdLoaded(adSize)
@@ -325,7 +325,7 @@ object AdmobUtils {
         mAdView?.adListener = object : AdListener() {
             override fun onAdLoaded() {
                 mAdView.onPaidEventListener =
-                    OnPaidEventListener { adValue -> callback.onAdPaid(adValue, mAdView) }
+                    OnPaidEventListener { adValue -> AdjustUtils.postRevenueAdjust(adValue,mAdView.adUnitId) }
                 shimmerFrameLayout?.stopShimmer()
                 viewGroup.removeView(tagView)
                 callback.onBannerAdLoaded(adSize)
@@ -381,7 +381,7 @@ object AdmobUtils {
                     }
 
                     override fun onAdPaid(adValue: AdValue, mAdView: AdView) {
-                        bannerAdCallback.onAdPaid(adValue,mAdView)
+                        AdjustUtils.postRevenueAdjust(adValue,mAdView.adUnitId)
                     }
                 })
         }
@@ -427,7 +427,7 @@ object AdmobUtils {
                 nativeHolder.isLoad = false
                 nativeHolder.native_mutable.value = nativeAd
                 nativeAd.setOnPaidEventListener { adValue: AdValue? -> adValue?.let {
-                    AdjustUtils.postRevenueAdjust(
+                    AdjustUtils.postRevenueAdjustNative(nativeAd,
                         it,nativeHolder.ads)
                 } }
                 adCallback.onLoadedAndGetNativeAd(nativeAd)
@@ -501,7 +501,7 @@ object AdmobUtils {
             nativeHolder.native_mutable.observe((activity as LifecycleOwner)) { nativeAd: NativeAd? ->
                 if (nativeAd != null) {
                     nativeAd.setOnPaidEventListener {
-                        AdjustUtils.postRevenueAdjust(it, nativeHolder.ads)
+                        AdjustUtils.postRevenueAdjustNative(nativeAd,it, nativeHolder.ads)
                     }
                     val adView = activity.layoutInflater.inflate(layout, null) as NativeAdView
                     populateNativeAdView(nativeAd, adView, size)
@@ -573,7 +573,7 @@ object AdmobUtils {
                 viewGroup.removeAllViews()
                 viewGroup.addView(adView)
                 nativeAd.setOnPaidEventListener { adValue: AdValue ->
-                    AdjustUtils.postRevenueAdjust(adValue, s)
+                    AdjustUtils.postRevenueAdjustNative(nativeAd,adValue, s)
                 }
                 //viewGroup.setVisibility(View.VISIBLE);
             }.withAdListener(object : AdListener() {
@@ -625,7 +625,7 @@ object AdmobUtils {
                 viewGroup.removeAllViews()
                 viewGroup.addView(adView)
                 nativeAd.setOnPaidEventListener { adValue: AdValue ->
-                    AdjustUtils.postRevenueAdjust(adValue, s)
+                    AdjustUtils.postRevenueAdjustNative(nativeAd,adValue, s)
                 }
                 //viewGroup.setVisibility(View.VISIBLE);
             }.withAdListener(object : AdListener() {
@@ -750,6 +750,7 @@ object AdmobUtils {
                     isClick = false
                     Handler(Looper.getMainLooper()).postDelayed({
                         Log.d("===DelayLoad", "delay")
+
                         aBoolean.fullScreenContentCallback = object : FullScreenContentCallback() {
                             override fun onAdDismissedFullScreenContent() {
                                 isAdShowing = false
@@ -788,15 +789,7 @@ object AdmobUtils {
                                 handler.removeCallbacksAndMessages(null)
                                 isAdShowing = true
                                 adCallback?.onAdShowed()
-                                try {
-                                    aBoolean.setOnPaidEventListener { adValue ->
-                                        AdjustUtils.postRevenueAdjust(
-                                            adValue,
-                                            interHolder.inter?.adUnitId
-                                        )
-                                    }
-                                } catch (e: Exception) {
-                                }
+
                             }
                         }
                         showInterstitialAdNew(activity, aBoolean, adCallback)
@@ -873,7 +866,7 @@ object AdmobUtils {
             Handler(Looper.getMainLooper()).postDelayed({
                 callback?.onStartAction()
                 mInterstitialAd.setOnPaidEventListener { adValue ->
-                    AdjustUtils.postRevenueAdjust(
+                    AdjustUtils.postRevenueAdjustInter(mInterstitialAd,
                         adValue,
                         mInterstitialAd.adUnitId
                     )
@@ -1264,7 +1257,7 @@ object AdmobUtils {
                         if (mInterstitialAd != null) {
                             mInterstitialAd!!.onPaidEventListener =
                                 OnPaidEventListener { adValue: AdValue? -> adValue?.let {
-                                    AdjustUtils.postRevenueAdjust(
+                                    AdjustUtils.postRevenueAdjustInter(mInterstitialAd!!,
                                         it, mInterstitialAd!!.adUnitId)
                                 } }
                             mInterstitialAd!!.fullScreenContentCallback =
@@ -1440,7 +1433,7 @@ object AdmobUtils {
         builder.withNativeAdOptions(adOptions)
         builder.forNativeAd { nativeAd ->
             nativeAd.setOnPaidEventListener { adValue: AdValue? ->
-                adValue?.let { AdjustUtils.postRevenueAdjust(it, adUnit = id) }}
+                adValue?.let { AdjustUtils.postRevenueAdjustNative(nativeAd,it, adUnit = id) }}
             listener.onLoaded(nativeAd)
             populateNativeAdView(nativeAd,adView.findViewById(R.id.native_ad_view))
             viewGroup.removeAllViews()
@@ -1490,7 +1483,7 @@ object AdmobUtils {
             nativeHolder.isLoad = false
             nativeHolder.native_mutable.value = nativeAd
             nativeAd.setOnPaidEventListener { adValue: AdValue? -> adValue?.let {
-                AdjustUtils.postRevenueAdjust(it, adUnit = nativeHolder.ads)
+                AdjustUtils.postRevenueAdjustNative(nativeAd,it, adUnit = nativeHolder.ads)
             } }
             adCallback.onLoadedAndGetNativeAd(nativeAd)
         }
@@ -1558,7 +1551,7 @@ object AdmobUtils {
             nativeHolder.native_mutable.observe((activity as LifecycleOwner)) { nativeAd: NativeAd? ->
                 if (nativeAd != null) {
                     nativeAd.setOnPaidEventListener {
-                        AdjustUtils.postRevenueAdjust(it, adUnit = nativeHolder.ads)
+                        AdjustUtils.postRevenueAdjustNative(nativeAd,it, adUnit = nativeHolder.ads)
                     }
                     val adView = activity.layoutInflater.inflate(layout, null) as NativeAdView
                     populateNativeAdView(nativeHolder.nativeAd!!,adView.findViewById(R.id.native_ad_view))
@@ -1601,7 +1594,7 @@ object AdmobUtils {
             listener.onLoaded(nativeAd)
             nativeAd.setOnPaidEventListener { adValue: AdValue? ->
                 adValue?.let {
-                    AdjustUtils.postRevenueAdjust(
+                    AdjustUtils.postRevenueAdjustNative(nativeAd,
                         adValue,
                         id
                     )
