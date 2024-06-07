@@ -684,6 +684,12 @@ object AdmobUtils {
                     }
                     interHolder.inter = interstitialAd
                     interHolder.check = false
+                    interHolder.inter!!.setOnPaidEventListener { adValue ->
+                        AdjustUtils.postRevenueAdjustInter(interHolder.inter!!,
+                            adValue,
+                            interHolder.inter!!.adUnitId
+                        )
+                    }
                     adLoadCallback.onAdLoaded(interstitialAd, false)
                     Log.i("adLog", "onAdLoaded")
                 }
@@ -865,12 +871,7 @@ object AdmobUtils {
             isAdShowing = true
             Handler(Looper.getMainLooper()).postDelayed({
                 callback?.onStartAction()
-                mInterstitialAd.setOnPaidEventListener { adValue ->
-                    AdjustUtils.postRevenueAdjustInter(mInterstitialAd,
-                        adValue,
-                        mInterstitialAd.adUnitId
-                    )
-                }
+
                 mInterstitialAd.show(activity)
             },400)
         } else {
