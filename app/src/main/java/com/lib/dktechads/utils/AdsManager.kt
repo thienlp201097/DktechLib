@@ -39,10 +39,6 @@ object AdsManager {
             override fun onAdFail(error: String) {
                 Toast.makeText(activity,"LoadFailed",Toast.LENGTH_SHORT).show()
             }
-
-            override fun onAdRevenuePaid(ad: MaxAd?) {
-
-            }
         })
     }
     fun loadInter(context: Context){
