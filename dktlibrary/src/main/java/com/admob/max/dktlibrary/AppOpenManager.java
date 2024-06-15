@@ -48,6 +48,8 @@ public class AppOpenManager implements Application.ActivityLifecycleCallbacks, L
     private long appResumeLoadTime = 0;
     private long splashLoadTime = 0;
     private int splashTimeout = 0;
+    public long timeToBackground = 0;
+    private long waitingTime = 0;
     private boolean isInitialized = false;
     public boolean isAppResumeEnabled = true;
     private final List<Class> disabledAppOpenList;
@@ -61,6 +63,10 @@ public class AppOpenManager implements Application.ActivityLifecycleCallbacks, L
         }
         return false;
     });
+
+    public void setWaitingTime(long waitingTime){
+        this.waitingTime = waitingTime;
+    }
 
     /**
      * Constructor
@@ -214,15 +220,12 @@ public class AppOpenManager implements Application.ActivityLifecycleCallbacks, L
 
     @Override
     public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
+
     }
 
     @Override
     public void onActivityStarted(Activity activity) {
         Log.d("===ADS", activity.getClass() + "|"+AdActivity.class);
-//        if (activity.getClass() == AdActivity.class){
-//            Log.d("===ADS", "Back");
-//            return;
-//        }
         currentActivity = activity;
         Log.d("===ADS", "Running");
     }
@@ -243,10 +246,12 @@ public class AppOpenManager implements Application.ActivityLifecycleCallbacks, L
 
     @Override
     public void onActivityStopped(Activity activity) {
+
     }
 
     @Override
     public void onActivityPaused(Activity activity) {
+
     }
 
     @Override
@@ -346,12 +351,6 @@ public class AppOpenManager implements Application.ActivityLifecycleCallbacks, L
         if (ProcessLifecycleOwner.get().getLifecycle().getCurrentState().isAtLeast(Lifecycle.State.STARTED)) {
             new Handler().postDelayed(() -> {
                 if (appResumeAd != null){
-                    appResumeAd.setOnPaidEventListener(new OnPaidEventListener() {
-                        @Override
-                        public void onPaidEvent(@NonNull AdValue adValue) {
-                            AdjustUtils.INSTANCE.postRevenueAdjust(adValue,appResumeAd.getAdUnitId());
-                        }
-                    });
                     appResumeAd.setFullScreenContentCallback(callback);
                     if (currentActivity != null){
                         showDialog(currentActivity);
@@ -361,13 +360,17 @@ public class AppOpenManager implements Application.ActivityLifecycleCallbacks, L
             }, 100);
         }
     }
-
     @OnLifecycleEvent(Lifecycle.Event.ON_START)
     protected void onMoveToForeground() {
         // Show the ad (if available) when the app moves to foreground.
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
+                Log.d("===OnStart", (System.currentTimeMillis() - timeToBackground) + "");
+
+                if (System.currentTimeMillis() - timeToBackground < 30000){
+                    return;
+                }
 
                 if (currentActivity == null) {
                     return;
@@ -422,5 +425,6 @@ public class AppOpenManager implements Application.ActivityLifecycleCallbacks, L
 
         }
     }
+
 }
 
