@@ -36,6 +36,10 @@ class MainActivity2 : AppCompatActivity() {
 
                     }
 
+                    override fun onAdRevenuePaid(ad: MaxAd) {
+
+                    }
+
                 })
         }
     }
@@ -46,6 +50,10 @@ class MainActivity2 : AppCompatActivity() {
             }
 
             override fun onBannerShowSucceed() {
+            }
+
+            override fun onAdRevenuePaid(ad: MaxAd) {
+
             }
         })
         super.onResume()
