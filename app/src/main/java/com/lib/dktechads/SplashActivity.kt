@@ -43,7 +43,11 @@ class SplashActivity : AppCompatActivity() {
                             override fun onAdFail(error: String) {
                                 Toast.makeText(this@SplashActivity,"Failed", Toast.LENGTH_SHORT).show()
                             }
-                        })
+
+                                override fun onAdRevenuePaid(ad: MaxAd) {
+
+                                }
+                            })
                         Utils.getInstance().replaceActivity(this@SplashActivity, MainActivity::class.java)
                     }
                 })
