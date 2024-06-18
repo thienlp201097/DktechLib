@@ -9,6 +9,7 @@ import com.admob.max.dktlibrary.ApplovinUtil
 import com.admob.max.dktlibrary.callback_applovin.BannerCallback
 import com.admob.max.dktlibrary.callback_applovin.InterstititialCallback
 import com.applovin.mediation.MaxAd
+import com.lib.dktechads.utils.AdsManager
 
 class MainActivity2 : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -16,7 +17,7 @@ class MainActivity2 : AppCompatActivity() {
         setContentView(R.layout.activity_main2)
         val btn = findViewById<Button>(R.id.btn_2)
         btn.setOnClickListener {
-                ApplovinUtil.loadAndShowInterstitialsWithDialogCheckTime(this,"loadandshow",1500,object :
+                ApplovinUtil.loadAndShowInterstitialsWithDialogCheckTime(this,AdsManager.interHolder,object :
                     InterstititialCallback {
                     override fun onInterstitialReady() {
 
