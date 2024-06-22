@@ -21,7 +21,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
-import com.airbnb.lottie.LottieAnimationView
 import com.admob.max.dktlibrary.NativeFunc.Companion.populateNativeAdView
 import com.admob.max.dktlibrary.NativeFunc.Companion.populateNativeAdViewNoBtn
 import com.admob.max.dktlibrary.adjust.AdjustUtils
@@ -37,6 +36,7 @@ import com.admob.max.dktlibrary.utils.admod.callback.NativeAdmobCallback
 import com.admob.max.dktlibrary.utils.admod.callback.NativeFullScreenCallBack
 import com.admob.max.dktlibrary.utils.admod.callback.RewardAdCallback
 import com.admob.max.dktlibrary.utils.admod.remote.BannerPlugin
+import com.airbnb.lottie.LottieAnimationView
 import com.facebook.shimmer.ShimmerFrameLayout
 import com.google.ads.mediation.admob.AdMobAdapter
 import com.google.android.gms.ads.AdError
@@ -364,11 +364,16 @@ object AdmobUtils {
     @JvmStatic
     fun loadAndShowBannerCollapsibleWithConfig(
         activity: Activity,
-        id: String,refreshRateSec : Int,view: ViewGroup,
+        id: String, refreshRateSec: Int, view: ViewGroup, size: GoogleEBanner,
         bannerAdCallback: BannerCollapsibleAdCallback
     ) {
         var bannerPlugin: BannerPlugin? = null
-        val bannerConfig = BannerPlugin.BannerConfig(id,"collapsible_bottom",refreshRateSec,0)
+        val type = if (size == GoogleEBanner.UNIFIED_TOP) {
+            "collapsible_top"
+        } else {
+            "collapsible_bottom"
+        }
+        val bannerConfig = BannerPlugin.BannerConfig(id,type,refreshRateSec,0)
         bannerPlugin = bannerConfig.adUnitId?.let {
             BannerPlugin(
                 activity, view, it, bannerConfig, object : BannerRemoteConfig {
