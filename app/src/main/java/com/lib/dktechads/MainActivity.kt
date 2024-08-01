@@ -247,6 +247,10 @@ class MainActivity : AppCompatActivity() {
                 override fun onAdFail(error: String?) {
                     startActivity(Intent(this@MainActivity, MainActivity2::class.java))
                 }
+
+                override fun onPaid(adValue: AdValue?, adUnitAds: String?) {
+
+                }
             },true)
         }
 

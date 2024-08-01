@@ -47,6 +47,10 @@ object AdsManagerAdmod {
                 override fun onAdFail(message: String?) {
                     Utils.getInstance().showMessenger(context, "onAdFail")
                 }
+
+                override fun onPaid(adValue: AdValue?, adUnitAds: String?) {
+
+                }
             }
         )
     }
@@ -76,6 +80,10 @@ object AdsManagerAdmod {
                     Utils.getInstance().showMessenger(context, "onAdFail")
                 }
 
+                override fun onPaid(adValue: AdValue?, adUnitAds: String?) {
+
+                }
+
                 override fun onEventClickAdClosed() {
                     interHolder.inter = null
                     loadInter(context,interHolder)
@@ -102,6 +110,10 @@ object AdsManagerAdmod {
 
                 override fun onAdFail(error: String?) {
                 }
+
+                override fun onPaid(adValue: AdValue?, adUnitAds: String?) {
+
+                }
             })
     }
 
@@ -117,6 +129,10 @@ object AdsManagerAdmod {
 
             override fun NativeFailed(massage: String) {
                 Utils.getInstance().showMessenger(activity, "onAdsFailed")
+            }
+
+            override fun onPaid(adValue: AdValue?, adUnitAds: String?) {
+
             }
         })
     }

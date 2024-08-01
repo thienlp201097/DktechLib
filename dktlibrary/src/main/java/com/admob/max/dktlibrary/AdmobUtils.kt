@@ -433,6 +433,7 @@ object AdmobUtils {
                 nativeHolder.isLoad = false
                 nativeHolder.native_mutable.value = nativeAd
                 nativeAd.setOnPaidEventListener { adValue: AdValue? -> adValue?.let {
+                    adCallback.onPaid(adValue,nativeHolder.ads)
                     AdjustUtils.postRevenueAdjustNative(nativeAd,
                         it,nativeHolder.ads)
                 } }
@@ -457,6 +458,7 @@ object AdmobUtils {
     interface AdsNativeCallBackAdmod {
         fun NativeLoaded()
         fun NativeFailed(massage : String)
+        fun onPaid(adValue: AdValue?, adUnitAds: String?)
     }
 
     @JvmStatic
@@ -517,6 +519,7 @@ object AdmobUtils {
                 if (nativeAd != null) {
                     nativeAd.setOnPaidEventListener {
                         AdjustUtils.postRevenueAdjustNative(nativeAd,it, nativeHolder.ads)
+                        callback.onPaid(it,nativeHolder.ads)
                     }
                     val adView = activity.layoutInflater.inflate(layout, null) as NativeAdView
                     populateNativeAdView(nativeAd, adView, size)
@@ -600,6 +603,7 @@ object AdmobUtils {
                 }
                 viewGroup.addView(adView)
                 nativeAd.setOnPaidEventListener { adValue: AdValue ->
+                    adCallback.onAdPaid(adValue,s)
                     AdjustUtils.postRevenueAdjustNative(nativeAd,adValue, s)
                 }
                 //viewGroup.setVisibility(View.VISIBLE);
@@ -661,6 +665,7 @@ object AdmobUtils {
                 viewGroup.addView(adView)
                 nativeAd.setOnPaidEventListener { adValue: AdValue ->
                     AdjustUtils.postRevenueAdjustNative(nativeAd,adValue, s)
+                    adCallback.onAdPaid(adValue,s)
                 }
                 //viewGroup.setVisibility(View.VISIBLE);
             }.withAdListener(object : AdListener() {
@@ -728,6 +733,7 @@ object AdmobUtils {
                             adValue,
                             interHolder.inter!!.adUnitId
                         )
+                        adLoadCallback.onPaid(adValue, interHolder.inter!!.adUnitId)
                     }
                     adLoadCallback.onAdLoaded(interstitialAd, false)
                     Log.i("adLog", "onAdLoaded")
@@ -1457,7 +1463,9 @@ object AdmobUtils {
         builder.withNativeAdOptions(adOptions)
         builder.forNativeAd { nativeAd ->
             nativeAd.setOnPaidEventListener { adValue: AdValue? ->
-                adValue?.let { AdjustUtils.postRevenueAdjustNative(nativeAd,it, adUnit = id) }}
+                adValue?.let {
+                    AdjustUtils.postRevenueAdjustNative(nativeAd,it, adUnit = id) }
+            }
             listener.onLoaded(nativeAd)
             populateNativeAdView(nativeAd,adView.findViewById(R.id.native_ad_view))
             try {
@@ -1795,6 +1803,7 @@ object AdmobUtils {
                 if (nativeAd != null) {
                     nativeAd.setOnPaidEventListener {
                         AdjustUtils.postRevenueAdjustNative(nativeAd,it,nativeHolder.ads)
+                        callback.onPaid(it,nativeHolder.ads)
                     }
                     val adView = activity.layoutInflater.inflate(layout, null) as NativeAdView
                     populateNativeAdViewNoBtn(nativeAd, adView, size)

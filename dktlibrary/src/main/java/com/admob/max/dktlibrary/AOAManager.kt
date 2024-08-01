@@ -165,7 +165,10 @@ class AOAManager(private val activity: Activity,val appOpen: String,val timeOut:
                             txt?.visibility = View.INVISIBLE
                         } catch (ignored: Exception) {
                         }
-                        setOnPaidEventListener { appOpenAdsListener.onAdPaid(it,adUnitId) }
+                        setOnPaidEventListener {
+                            appOpenAdsListener.onAdPaid(it,adUnitId)
+                            AdjustUtils.postRevenueAdjust(it,adUnitId)
+                        }
                         show(activity)
                     }else{
                         appOpenAdsListener.onAdsFailed("AOA can't show")

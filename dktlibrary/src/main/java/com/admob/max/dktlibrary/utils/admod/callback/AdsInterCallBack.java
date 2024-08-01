@@ -8,4 +8,5 @@ public interface AdsInterCallBack {
     void onAdShowed();
     void onAdLoaded();
     void onAdFail(String error);
+    void onPaid(AdValue adValue, String adUnitAds);
 }
