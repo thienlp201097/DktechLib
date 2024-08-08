@@ -3,6 +3,7 @@ package com.admob.max.dktlibrary.utils.admod.remote
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.os.Bundle
+import android.util.DisplayMetrics
 import android.view.Gravity
 import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
@@ -65,7 +66,16 @@ internal class BannerAdView(
     private fun getAdSize(bannerType: BannerPlugin.BannerType): AdSize {
         return when (bannerType) {
             BannerPlugin.BannerType.Standard -> AdSize.BANNER
-            BannerPlugin.BannerType.Adaptive,
+            BannerPlugin.BannerType.Adaptive->{
+                val display = activity.windowManager.defaultDisplay
+                val outMetrics = DisplayMetrics()
+                display.getMetrics(outMetrics)
+                val widthPixels = outMetrics.widthPixels.toFloat()
+                val density = outMetrics.density
+                val adWidth = (widthPixels / density).toInt()
+                // Step 3 - Get adaptive ad size and return for setting on the ad view.
+                AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(context, adWidth)
+            }
             BannerPlugin.BannerType.CollapsibleBottom,
             BannerPlugin.BannerType.CollapsibleTop -> {
                 val displayMetrics = activity.resources.displayMetrics

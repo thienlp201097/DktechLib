@@ -14,9 +14,11 @@ import com.admob.max.dktlibrary.callback_applovin.BannerCallback
 import com.admob.max.dktlibrary.callback_applovin.NativeCallBackNew
 import com.admob.max.dktlibrary.callback_applovin.RewardCallback
 import com.admob.max.dktlibrary.utils.admod.callback.AdsInterCallBack
+import com.admob.max.dktlibrary.utils.admod.remote.BannerPlugin
 import com.applovin.mediation.MaxAd
 import com.applovin.mediation.nativeAds.MaxNativeAdLoader
 import com.applovin.mediation.nativeAds.MaxNativeAdView
+import com.google.android.gms.ads.AdSize
 import com.google.android.gms.ads.AdValue
 import com.google.android.gms.ads.AdView
 import com.google.android.gms.ads.nativead.NativeAd
@@ -194,19 +196,35 @@ class MainActivity : AppCompatActivity() {
             })
         }
         binding.loadBanner.setOnClickListener {
-            AdmobUtils.loadAdBanner(this,"",binding.bannerContainer,object : AdmobUtils.BannerCallBack{
+//            AdmobUtils.loadAdBanner(this,"",binding.bannerContainer,object : AdmobUtils.BannerCallBack{
+//                override fun onClickAds() {
+//
+//                }
+//
+//                override fun onLoad() {
+//                }
+//
+//                override fun onFailed(message: String) {
+//                }
+//
+//                override fun onPaid(adValue: AdValue?, mAdView: AdView?) {
+//                }
+//            })
+            AdmobUtils.loadAndShowBannerWithConfig(this,"",5,binding.bannerContainer,
+                BannerPlugin.BannerConfig.TYPE_ADAPTIVE,object : AdmobUtils.BannerCollapsibleAdCallback{
                 override fun onClickAds() {
 
                 }
 
-                override fun onLoad() {
+                override fun onBannerAdLoaded(adSize: AdSize) {
                 }
 
-                override fun onFailed(message: String) {
+                override fun onAdFail(message: String) {
                 }
 
-                override fun onPaid(adValue: AdValue?, mAdView: AdView?) {
+                override fun onAdPaid(adValue: AdValue, mAdView: AdView) {
                 }
+
             })
         }
 

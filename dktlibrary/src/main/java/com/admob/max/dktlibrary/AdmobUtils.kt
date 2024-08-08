@@ -236,6 +236,9 @@ object AdmobUtils {
             return
         }
         banner.mAdView?.destroy()
+        banner.mAdView?.let {
+            viewGroup.removeView(it)
+        }
         banner.mAdView = AdView(activity)
         if (isTesting) {
             bannerId = activity.getString(R.string.test_ads_admob_banner_collapsible_id)
@@ -392,6 +395,37 @@ object AdmobUtils {
                 })
         }
     }
+
+    @JvmStatic
+    fun loadAndShowBannerWithConfig(
+        activity: Activity,
+        id: String, refreshRateSec: Int, view: ViewGroup, size: String,
+        bannerAdCallback: BannerCollapsibleAdCallback
+    ) {
+        var bannerPlugin: BannerPlugin? = null
+        val bannerConfig = BannerPlugin.BannerConfig(id, size, refreshRateSec, 0)
+        bannerPlugin = bannerConfig.adUnitId?.let {
+            BannerPlugin(
+                activity, view, it, bannerConfig, object : BannerRemoteConfig {
+                    override fun onBannerAdLoaded(adSize: AdSize?) {
+                        adSize?.let { it1 -> bannerAdCallback.onBannerAdLoaded(it1) }
+                        shimmerFrameLayout?.stopShimmer()
+                        Log.d("===Banner==", "reload banner")
+                    }
+
+                    override fun onAdFail() {
+                        Log.d("===Banner", "Banner2")
+                        shimmerFrameLayout?.stopShimmer()
+                        bannerAdCallback.onAdFail("Banner Failed")
+                    }
+
+                    override fun onAdPaid(adValue: AdValue, mAdView: AdView) {
+                        AdjustUtils.postRevenueAdjust(adValue,mAdView.adUnitId)
+                    }
+                })
+        }
+    }
+
 
     private fun getAdSize(context: Activity): AdSize {
         // Step 2 - Determine the screen width (less decorations) to use for the ad width.
