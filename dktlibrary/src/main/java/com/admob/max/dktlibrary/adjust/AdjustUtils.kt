@@ -27,13 +27,13 @@ object AdjustUtils {
             config
         )
         adjustConfig.setLogLevel(LogLevel.WARN)
-        Adjust.onCreate(adjustConfig)
+        Adjust.initSdk(adjustConfig)
     }
 
     fun postRevenueAdjustMax(ad : MaxAd){
         Log.d("==postRevenueAdjustMax==", "postRevenueAdjustMax: ${ad.revenue}")
 
-        val adjustAdRevenue = AdjustAdRevenue(AdjustConfig.AD_REVENUE_APPLOVIN_MAX)
+        val adjustAdRevenue = AdjustAdRevenue("applovin_max_sdk")
         adjustAdRevenue.setRevenue(ad.revenue, "USD")
         adjustAdRevenue.adRevenueNetwork = ad.networkName
         adjustAdRevenue.adRevenueUnit = ad.adUnitId
@@ -42,7 +42,7 @@ object AdjustUtils {
     }
     fun postRevenueAdjust(ad: AdValue, adUnit: String?) {
         Log.d("==postRevenueAdjustBannerReward==", "postRevenueAdjustBannerReward: ${ad.valueMicros / 1000000.0}")
-        val adjustAdRevenue = AdjustAdRevenue(AdjustConfig.AD_REVENUE_ADMOB)
+        val adjustAdRevenue = AdjustAdRevenue("admob_sdk")
         adjustAdRevenue.setRevenue(ad.valueMicros / 1000000.0, ad.currencyCode)
         adjustAdRevenue.adRevenueUnit = adUnit
         Adjust.trackAdRevenue(adjustAdRevenue)
@@ -50,7 +50,7 @@ object AdjustUtils {
     fun postRevenueAdjustInter(interAd : InterstitialAd,ad: AdValue, adUnit: String?) {
         Log.d("==postRevenueAdjustInter==", "postRevenueAdjustInter: ${ad.valueMicros / 1000000.0}")
         val loadedAdapterResponseInfo: AdapterResponseInfo? = interAd.responseInfo.loadedAdapterResponseInfo
-        val adjustAdRevenue = AdjustAdRevenue(AdjustConfig.AD_REVENUE_ADMOB)
+        val adjustAdRevenue = AdjustAdRevenue("admob_sdk")
         adjustAdRevenue.setRevenue(ad.valueMicros / 1000000.0, ad.currencyCode)
         adjustAdRevenue.adRevenueUnit = adUnit
         adjustAdRevenue.adRevenueNetwork = loadedAdapterResponseInfo?.adSourceName
@@ -60,7 +60,7 @@ object AdjustUtils {
     fun postRevenueAdjustNative(nativeAd : NativeAd,ad: AdValue, adUnit: String?) {
         Log.d("==postRevenueAdjustNative==", "postRevenueAdjustNative: ${ad.valueMicros / 1000000.0}")
         val loadedAdapterResponseInfo: AdapterResponseInfo? = nativeAd.responseInfo?.loadedAdapterResponseInfo
-        val adjustAdRevenue = AdjustAdRevenue(AdjustConfig.AD_REVENUE_ADMOB)
+        val adjustAdRevenue = AdjustAdRevenue("admob_sdk")
         adjustAdRevenue.setRevenue(ad.valueMicros / 1000000.0, ad.currencyCode)
         adjustAdRevenue.adRevenueUnit = adUnit
         adjustAdRevenue.adRevenueNetwork = loadedAdapterResponseInfo?.adSourceName
@@ -69,7 +69,7 @@ object AdjustUtils {
 
     fun postRevenueAdjustRewarded(interAd : RewardedAd,ad: AdValue, adUnit: String?) {
         val loadedAdapterResponseInfo: AdapterResponseInfo? = interAd.responseInfo.loadedAdapterResponseInfo
-        val adjustAdRevenue = AdjustAdRevenue(AdjustConfig.AD_REVENUE_ADMOB)
+        val adjustAdRevenue = AdjustAdRevenue("admob_sdk")
         adjustAdRevenue.setRevenue(ad.valueMicros / 1000000.0, ad.currencyCode)
         adjustAdRevenue.adRevenueUnit = adUnit
         adjustAdRevenue.adRevenueNetwork = loadedAdapterResponseInfo?.adSourceName

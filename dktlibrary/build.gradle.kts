@@ -72,8 +72,8 @@ dependencies {
     implementation("com.google.android.ump:user-messaging-platform:2.2.0")
 
     //Adjust
-    implementation("com.adjust.sdk:adjust-android:4.38.4")
+    implementation("com.adjust.sdk:adjust-android:5.0.0")
     implementation("com.android.installreferrer:installreferrer:2.2")
     implementation("com.google.android.gms:play-services-ads-identifier:18.1.0")
-    implementation("com.adjust.sdk:adjust-android-webbridge:4.38.4")
+    implementation("com.adjust.sdk:adjust-android-webbridge:5.0.0")
 }
