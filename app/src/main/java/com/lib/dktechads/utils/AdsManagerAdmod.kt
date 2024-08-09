@@ -137,6 +137,8 @@ object AdsManagerAdmod {
         })
     }
 
+
+
     interface AdListener {
         fun onAdClosed()
         fun onFailed()

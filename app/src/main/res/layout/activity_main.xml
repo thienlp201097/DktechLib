@@ -140,6 +140,32 @@
                     android:text="banner Max" />
             </androidx.appcompat.widget.LinearLayoutCompat>
 
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:id="@+id/ln6"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/ln4"
+                android:gravity="center"
+                app:layout_constraintTop_toBottomOf="@+id/ln5">
+
+                <Button
+                    android:id="@+id/load_reward"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/btn_show_reward"
+                    android:layout_centerHorizontal="true"
+                    android:text="Load Reward" />
+
+                <Button
+                    android:id="@+id/show_reward"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/load_native"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginStart="20dp"
+                    android:text="Show Reward" />
+            </androidx.appcompat.widget.LinearLayoutCompat>
+
 
             <Button
                 android:id="@+id/btn_load_show_inter_callback2"
@@ -149,7 +175,7 @@
                 android:text="load and show intersitial"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/ln5" />
+                app:layout_constraintTop_toBottomOf="@+id/ln6" />
 
             <Button
                 android:id="@+id/btn_load_show_inter_admob"

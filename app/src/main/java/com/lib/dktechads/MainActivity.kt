@@ -2,6 +2,7 @@ package com.lib.dktechads
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.FrameLayout
@@ -13,7 +14,11 @@ import com.admob.max.dktlibrary.GoogleENative
 import com.admob.max.dktlibrary.callback_applovin.BannerCallback
 import com.admob.max.dktlibrary.callback_applovin.NativeCallBackNew
 import com.admob.max.dktlibrary.callback_applovin.RewardCallback
+import com.admob.max.dktlibrary.utils.admod.RewardHolderAdmob
+import com.admob.max.dktlibrary.utils.admod.RewardedInterstitialHolderAdmob
+import com.admob.max.dktlibrary.utils.admod.callback.AdLoadCallback
 import com.admob.max.dktlibrary.utils.admod.callback.AdsInterCallBack
+import com.admob.max.dktlibrary.utils.admod.callback.RewardAdCallback
 import com.admob.max.dktlibrary.utils.admod.remote.BannerPlugin
 import com.applovin.mediation.MaxAd
 import com.applovin.mediation.nativeAds.MaxNativeAdLoader
@@ -30,6 +35,8 @@ class MainActivity : AppCompatActivity() {
     val binding by lazy { ActivityMainBinding.inflate(layoutInflater) }
     lateinit var bannerContainer: ViewGroup
     lateinit var nativeLoader: MaxNativeAdLoader
+    var rewardInterHolder = RewardedInterstitialHolderAdmob("")
+    var rewardHolder = RewardHolderAdmob("")
 
     override fun onCreate(savedInstanceState: Bundle?) {
         window.setFlags(WindowManager.LayoutParams.FLAG_SECURE, WindowManager.LayoutParams.FLAG_SECURE)
@@ -298,21 +305,65 @@ class MainActivity : AppCompatActivity() {
 
             })
         }
-        ApplovinUtil.showNativeWithLayout(nativeAds,this, AdsManager.nativeHolder,R.layout.native_custom_ad_view,
-            GoogleENative.UNIFIED_MEDIUM,object :
-            NativeCallBackNew {
-            override fun onNativeAdLoaded(nativeAd: MaxAd?, nativeAdView: MaxNativeAdView?) {
-                Toast.makeText(this@MainActivity,"show success", Toast.LENGTH_SHORT).show()
-            }
+        
+        binding.loadReward.setOnClickListener { 
+            AdmobUtils.loadAdReward(this@MainActivity,rewardHolder ,object : AdLoadCallback{
+                    override fun onAdFail(message: String?) {
+                        
+                    }
 
-            override fun onAdFail(error: String) {
-                Toast.makeText(this@MainActivity,"Show failed", Toast.LENGTH_SHORT).show()
-            }
+                    override fun onAdLoaded() {
+                        
+                    }
 
-                override fun onAdRevenuePaid(ad: MaxAd) {
+                    override fun onPaid(adValue: AdValue?, adUnitAds: String?) {
+                        
+                    }
 
                 }
+            )
+        }
+
+        binding.showReward.setOnClickListener {
+            AdmobUtils.showAdRewardWithCallback(this,rewardHolder,object :
+                RewardAdCallback {
+                override fun onAdClosed() {
+                    Log.d("==RewardAdCallback==", "onAdClosed: ")
+                }
+
+                override fun onAdShowed() {
+                    Log.d("==RewardAdCallback==", "onAdShowed: ")
+                }
+
+                override fun onAdFail(message: String?) {
+                    
+                }
+
+                override fun onEarned() {
+                    Log.d("==RewardAdCallback==", "onEarned: ")
+                }
+
+                override fun onPaid(adValue: AdValue?, adUnitAds: String?) {
+                    
+                }
+
             })
+        }
+//        ApplovinUtil.showNativeWithLayout(nativeAds,this, AdsManager.nativeHolder,R.layout.native_custom_ad_view,
+//            GoogleENative.UNIFIED_MEDIUM,object :
+//            NativeCallBackNew {
+//            override fun onNativeAdLoaded(nativeAd: MaxAd?, nativeAdView: MaxNativeAdView?) {
+//                Toast.makeText(this@MainActivity,"show success", Toast.LENGTH_SHORT).show()
+//            }
+//
+//            override fun onAdFail(error: String) {
+//                Toast.makeText(this@MainActivity,"Show failed", Toast.LENGTH_SHORT).show()
+//            }
+//
+//                override fun onAdRevenuePaid(ad: MaxAd) {
+//
+//                }
+//            })
     }
 
     override fun onResume() {
