@@ -470,8 +470,13 @@ object ApplovinUtil : LifecycleObserver {
 
         val tagView: View =
             activity.layoutInflater.inflate(R.layout.banner_shimmer_layout, null, false)
-        bannerContainer.addView(tagView, 0)
-        bannerContainer.addView(banner, 1)
+        try {
+            bannerContainer.addView(tagView, 0)
+            bannerContainer.addView(banner, 1)
+        }catch (_ : Exception){
+
+        }
+
         val shimmerFrameLayout: ShimmerFrameLayout =
             tagView.findViewById(R.id.shimmer_view_container)
         shimmerFrameLayout.startShimmer()
@@ -793,7 +798,12 @@ object ApplovinUtil : LifecycleObserver {
         } else {
             activity.layoutInflater.inflate(R.layout.layoutnative_loading_small, null, false)
         }
-        nativeAdContainer.addView(tagView, 0)
+        try {
+            nativeAdContainer.addView(tagView, 0)
+        }catch (_ : Exception){
+
+        }
+
         val shimmerFrameLayout: ShimmerFrameLayout =
             tagView.findViewById<ShimmerFrameLayout>(R.id.shimmer_view_container)
         shimmerFrameLayout.startShimmer()
@@ -816,10 +826,10 @@ object ApplovinUtil : LifecycleObserver {
                 shimmerFrameLayout.stopShimmer()
                 try {
                     nativeAdContainer.removeAllViews()
+                    nativeAdContainer.addView(nativeAdView)
                 }catch (_: Exception){
 
                 }
-                nativeAdContainer.addView(nativeAdView)
                 adCallback.onNativeAdLoaded(ad,nativeAdView)
 
             }
@@ -1225,10 +1235,11 @@ object ApplovinUtil : LifecycleObserver {
                 nativeHolder.nativeAdLoader?.render(adView, nativeHolder.native)
                 try {
                     view.removeAllViews()
+                    view.addView(adView)
                 }catch (_: Exception){
 
                 }
-                view.addView(adView)
+
                 callback.onNativeAdLoaded(nativeHolder.native, adView)
             } else {
                 callback.onAdFail("NativeAd Null")
@@ -1239,7 +1250,11 @@ object ApplovinUtil : LifecycleObserver {
             } else {
                 context.layoutInflater.inflate(R.layout.layoutnative_loading_small, null, false)
             }
-            view.addView(tagView, 0)
+            try {
+                view.addView(tagView, 0)
+            }catch (_ : Exception){
+
+            }
             val shimmerFrameLayout: ShimmerFrameLayout = tagView.findViewById(R.id.shimmer_view_container)
             shimmerFrameLayout.startShimmer()
             nativeHolder.native_mutable.observe(context as LifecycleOwner) {
@@ -1248,10 +1263,10 @@ object ApplovinUtil : LifecycleObserver {
                         nativeHolder.nativeAdLoader?.render(adView, nativeHolder.native)
                         try {
                             view.removeAllViews()
+                            view.addView(adView)
                         }catch (_: Exception){
 
                         }
-                        view.addView(adView)
                         callback.onNativeAdLoaded(nativeHolder.native, adView)
                     } else {
                         shimmerFrameLayout.stopShimmer()
@@ -1298,7 +1313,11 @@ object ApplovinUtil : LifecycleObserver {
         } else {
             activity.layoutInflater.inflate(R.layout.layoutnative_loading_small, null, false)
         }
-        view.addView(tagView, 0)
+        try {
+            view.addView(tagView, 0)
+        }catch (_ : Exception){
+
+        }
         val shimmerFrameLayout: ShimmerFrameLayout =
             tagView.findViewById(R.id.shimmer_view_container)
         shimmerFrameLayout.startShimmer()
@@ -1318,10 +1337,10 @@ object ApplovinUtil : LifecycleObserver {
                 shimmerFrameLayout.stopShimmer()
                 try {
                     view.removeAllViews()
+                    view.addView(adView)
                 }catch (_: Exception){
 
                 }
-                view.addView(adView)
                 adCallback.onNativeAdLoaded(nativeHolder.native, adView)
             }
 
@@ -1381,7 +1400,11 @@ object ApplovinUtil : LifecycleObserver {
         } else {
             activity.layoutInflater.inflate(R.layout.layoutnative_loading_small, null, false)
         }
-        view.addView(tagView, 0)
+        try {
+            view.addView(tagView, 0)
+        }catch (_ : Exception){
+
+        }
         val shimmerFrameLayout: ShimmerFrameLayout =
             tagView.findViewById(R.id.shimmer_view_container)
         shimmerFrameLayout.startShimmer()
@@ -1393,16 +1416,17 @@ object ApplovinUtil : LifecycleObserver {
         nativeHolder.nativeAdLoader?.setNativeAdListener(object : MaxNativeAdListener() {
             override fun onNativeAdLoaded(nativeAdView: MaxNativeAdView?, ad: MaxAd) {
                 shimmerFrameLayout.stopShimmer()
-                try {
-                    view.removeAllViews()
-                }catch (_: Exception){
 
-                }
                 if (nativeHolder.native != null) {
                     nativeHolder.nativeAdLoader?.destroy(nativeHolder.native)
                 }
                 nativeHolder.native = ad
-                view.addView(nativeAdView)
+                try {
+                    view.removeAllViews()
+                    view.addView(nativeAdView)
+                }catch (_: Exception){
+
+                }
                 adCallback.onNativeAdLoaded(nativeHolder.native, nativeAdView)
             }
 
