@@ -368,7 +368,7 @@ object AdmobUtils {
     @JvmStatic
     fun loadAndShowBannerCollapsibleWithConfig(
         activity: Activity,
-        id: String, refreshRateSec: Int, view: ViewGroup, size: GoogleEBanner,
+        id: String, refreshRateSec: Int,cbFetchIntervalSec : Int, view: ViewGroup, size: GoogleEBanner,
         bannerAdCallback: BannerCollapsibleAdCallback
     ) {
         var bannerPlugin: BannerPlugin? = null
@@ -377,7 +377,7 @@ object AdmobUtils {
         } else {
             "collapsible_bottom"
         }
-        val bannerConfig = BannerPlugin.BannerConfig(id,type,refreshRateSec,0)
+        val bannerConfig = BannerPlugin.BannerConfig(id,type,refreshRateSec,cbFetchIntervalSec)
         bannerPlugin = bannerConfig.adUnitId?.let {
             BannerPlugin(
                 activity, view, it, bannerConfig, object : BannerRemoteConfig {
@@ -400,7 +400,7 @@ object AdmobUtils {
     @JvmStatic
     fun loadAndShowBannerWithConfig(
         activity: Activity,
-        id: String, refreshRateSec: Int, view: ViewGroup, size: String,
+        id: String, refreshRateSec: Int,cbFetchIntervalSec : Int, view: ViewGroup, size: String,
         bannerAdCallback: BannerCollapsibleAdCallback
     ) {
         var bannerPlugin: BannerPlugin? = null
