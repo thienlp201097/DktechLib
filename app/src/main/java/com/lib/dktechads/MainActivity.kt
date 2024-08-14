@@ -2,6 +2,7 @@ package com.lib.dktechads
 
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
 import android.util.Log
 import android.view.ViewGroup
 import android.view.WindowManager
@@ -325,14 +326,39 @@ class MainActivity : AppCompatActivity() {
         }
 
         binding.showReward.setOnClickListener {
-            AdmobUtils.showAdRewardWithCallback(this,rewardHolder,object :
-                RewardAdCallback {
+//            AdmobUtils.showAdRewardWithCallback(this,rewardHolder,object :
+//                RewardAdCallback {
+//                override fun onAdClosed() {
+//                    Log.d("==RewardAdCallback==", "onAdClosed: ")
+//                }
+//
+//                override fun onAdShowed() {
+//                    Log.d("==RewardAdCallback==", "onAdShowed: ")
+//                }
+//
+//                override fun onAdFail(message: String?) {
+//
+//                }
+//
+//                override fun onEarned() {
+//                    Log.d("==RewardAdCallback==", "onEarned: ")
+//                }
+//
+//                override fun onPaid(adValue: AdValue?, adUnitAds: String?) {
+//
+//                }
+//
+//            })
+            
+            AdmobUtils.loadAndShowRewardedInterstitialAdWithCallback(this,"",object : RewardAdCallback{
                 override fun onAdClosed() {
-                    Log.d("==RewardAdCallback==", "onAdClosed: ")
+                    
                 }
 
                 override fun onAdShowed() {
-                    Log.d("==RewardAdCallback==", "onAdShowed: ")
+                    Handler().postDelayed({
+                        AdmobUtils.dismissAdDialog()
+                    },200)
                 }
 
                 override fun onAdFail(message: String?) {
@@ -340,14 +366,14 @@ class MainActivity : AppCompatActivity() {
                 }
 
                 override fun onEarned() {
-                    Log.d("==RewardAdCallback==", "onEarned: ")
+                    
                 }
 
                 override fun onPaid(adValue: AdValue?, adUnitAds: String?) {
                     
                 }
 
-            })
+            },true)
         }
 //        ApplovinUtil.showNativeWithLayout(nativeAds,this, AdsManager.nativeHolder,R.layout.native_custom_ad_view,
 //            GoogleENative.UNIFIED_MEDIUM,object :
