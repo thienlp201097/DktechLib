@@ -404,7 +404,7 @@ object AdmobUtils {
         bannerAdCallback: BannerCollapsibleAdCallback
     ) {
         var bannerPlugin: BannerPlugin? = null
-        val bannerConfig = BannerPlugin.BannerConfig(id, size, refreshRateSec, 0)
+        val bannerConfig = BannerPlugin.BannerConfig(id, size, refreshRateSec, cbFetchIntervalSec)
         bannerPlugin = bannerConfig.adUnitId?.let {
             BannerPlugin(
                 activity, view, it, bannerConfig, object : BannerRemoteConfig {
