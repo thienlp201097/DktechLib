@@ -217,7 +217,7 @@ class MainActivity : AppCompatActivity() {
 //                override fun onPaid(adValue: AdValue?, mAdView: AdView?) {
 //                }
 //            })
-            AdmobUtils.loadAndShowBannerWithConfig(this,"",5,binding.bannerContainer,
+            AdmobUtils.loadAndShowBannerWithConfig(this,"",5,10,binding.bannerContainer,
                 BannerPlugin.BannerConfig.TYPE_ADAPTIVE,object : AdmobUtils.BannerCollapsibleAdCallback{
                 override fun onClickAds() {
 
