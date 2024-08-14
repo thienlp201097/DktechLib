@@ -154,5 +154,6 @@ internal class BannerAdView(
         super.onDetachedFromWindow()
         adView.adListener = object : AdListener() {}
         adView.destroy()
+        lastCBRequestTime = 0L
     }
 }
