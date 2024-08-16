@@ -63,7 +63,7 @@ dependencies {
 
     // Ads
     implementation("com.applovin:applovin-sdk:+")
-    implementation("com.google.android.gms:play-services-ads:23.1.0")
+    implementation("com.google.android.gms:play-services-ads:+")
     implementation("com.intuit.sdp:sdp-android:1.1.1")
 
     // Other
