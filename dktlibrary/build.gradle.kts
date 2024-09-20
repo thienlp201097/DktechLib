@@ -62,14 +62,14 @@ dependencies {
     implementation("com.facebook.shimmer:shimmer:0.5.0@aar")
 
     // Ads
-    implementation("com.applovin:applovin-sdk:+")
+    implementation("com.applovin:applovin-sdk:12.6.1")
     implementation("com.google.android.gms:play-services-ads:+")
     implementation("com.intuit.sdp:sdp-android:1.1.1")
 
     // Other
     implementation("com.google.code.gson:gson:2.10.1")
     implementation("com.airbnb.android:lottie:6.4.0")
-    implementation("com.google.android.ump:user-messaging-platform:2.2.0")
+    implementation("com.google.android.ump:user-messaging-platform:3.0.0")
 
     //Adjust
     implementation("com.adjust.sdk:adjust-android:5.0.0")

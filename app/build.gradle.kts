@@ -52,6 +52,7 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     implementation(project (":dktlibrary"))
-    implementation("com.applovin:applovin-sdk:+")
+    implementation("com.applovin:applovin-sdk:12.6.1")
     implementation("com.google.android.gms:play-services-ads:+")
+    implementation("com.google.ads.mediation:applovin:12.6.1.0")
 }
