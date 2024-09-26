@@ -558,8 +558,7 @@ object AdmobUtils {
 
             }
 
-            if (shimmerFrameLayout == null) shimmerFrameLayout =
-                tagView.findViewById(R.id.shimmer_view_container)
+            if (shimmerFrameLayout == null) shimmerFrameLayout = tagView.findViewById(R.id.shimmer_view_container)
             shimmerFrameLayout?.startShimmer()
             nativeHolder.native_mutable.observe((activity as LifecycleOwner)) { nativeAd: NativeAd? ->
                 if (nativeAd != null) {
