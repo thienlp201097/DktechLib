@@ -624,13 +624,6 @@ object ApplovinUtil : LifecycleObserver {
                 callback.onUserRewarded()
             }
 
-            override fun onRewardedVideoStarted(p0: MaxAd) {
-                callback.onRewardedVideoStarted()
-            }
-
-            override fun onRewardedVideoCompleted(p0: MaxAd) {
-                callback.onRewardedVideoCompleted()
-            }
         })
 
 
@@ -718,15 +711,6 @@ object ApplovinUtil : LifecycleObserver {
             override fun onUserRewarded(p0: MaxAd, p1: MaxReward) {
                 callback.onUserRewarded()
             }
-
-            override fun onRewardedVideoStarted(p0: MaxAd) {
-                callback.onRewardedVideoStarted()
-            }
-
-            override fun onRewardedVideoCompleted(p0: MaxAd) {
-                callback.onRewardedVideoCompleted()
-            }
-
         })
 
         // Load the first ad
