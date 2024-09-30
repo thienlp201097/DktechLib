@@ -62,7 +62,7 @@ dependencies {
     implementation("com.facebook.shimmer:shimmer:0.5.0@aar")
 
     // Ads
-    implementation("com.applovin:applovin-sdk:12.6.1")
+    implementation("com.applovin:applovin-sdk:13.0.0")
     implementation("com.google.android.gms:play-services-ads:+")
     implementation("com.intuit.sdp:sdp-android:1.1.1")
 
