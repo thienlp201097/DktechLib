@@ -163,6 +163,12 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
 
+        <ImageView
+            android:id="@+id/ivClose"
+            android:background="@color/black"
+            android:layout_width="24dp"
+            android:layout_height="24dp"/>
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </com.google.android.gms.ads.nativead.NativeAdView>

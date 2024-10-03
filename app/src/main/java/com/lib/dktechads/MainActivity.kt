@@ -24,6 +24,7 @@ import com.admob.max.dktlibrary.utils.admod.remote.BannerPlugin
 import com.applovin.mediation.MaxAd
 import com.applovin.mediation.nativeAds.MaxNativeAdLoader
 import com.applovin.mediation.nativeAds.MaxNativeAdView
+import com.applovin.sdk.AppLovinSdkUtils
 import com.google.android.gms.ads.AdSize
 import com.google.android.gms.ads.AdValue
 import com.google.android.gms.ads.AdView
@@ -281,7 +282,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         binding.loadAndShowNativeAdmob.setOnClickListener {
-            AdmobUtils.loadAndShowNativeAdsWithLayoutAds(this,
+            AdmobUtils.loadAndShowNativeAdsWithLayoutAdsCollapsible(this,
                 AdsManagerAdmod.nativeHolder,binding.nativead,R.layout.ad_template_medium,GoogleENative.UNIFIED_MEDIUM,object :
                 AdmobUtils.NativeAdCallbackNew {
                 override fun onLoadedAndGetNativeAd(ad: NativeAd?) {
@@ -301,9 +302,10 @@ class MainActivity : AppCompatActivity() {
                 }
 
                 override fun onClickAds() {
-
+                    val params: ViewGroup.LayoutParams = binding.nativead.layoutParams
+                    params.height = AppLovinSdkUtils.dpToPx(this@MainActivity,100)
+                    binding.nativead.layoutParams = params
                 }
-
             })
         }
         
