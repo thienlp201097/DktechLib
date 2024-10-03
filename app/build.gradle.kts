@@ -53,6 +53,6 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.core)
     implementation(project (":dktlibrary"))
     implementation("com.applovin:applovin-sdk:13.0.0")
-    implementation("com.google.android.gms:play-services-ads:+")
+    implementation("com.google.android.gms:play-services-ads:23.3.0")
     implementation("com.google.ads.mediation:applovin:13.0.0.1")
 }
