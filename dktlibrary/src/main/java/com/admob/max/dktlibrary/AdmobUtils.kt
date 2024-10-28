@@ -145,8 +145,12 @@ object AdmobUtils {
     //check open network
     @JvmStatic
     fun isNetworkConnected(context: Context): Boolean {
-        val cm = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        return cm.activeNetworkInfo != null && cm.activeNetworkInfo!!.isConnected
+        try {
+            val cm = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+            return cm.activeNetworkInfo != null && cm.activeNetworkInfo!!.isConnected
+        }catch (e : Exception){
+            return false
+        }
     }
 
     interface BannerCallBack {
