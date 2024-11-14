@@ -2,10 +2,12 @@ package com.lib.dktechads.utils
 
 import android.app.Activity
 import android.content.Context
+import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.MutableLiveData
 import com.admob.max.dktlibrary.AdmobUtils
+import com.admob.max.dktlibrary.AdmobUtils.AdsNativeCallBackAdmod
 import com.admob.max.dktlibrary.GoogleENative
 import com.admob.max.dktlibrary.utils.Utils
 import com.admob.max.dktlibrary.utils.admod.InterHolderAdmob
@@ -20,6 +22,7 @@ import com.lib.dktechads.R
 
 object AdsManagerAdmod {
     var nativeHolder = NativeHolderAdmob("ca-app-pub-3940256099942544/2247696110")
+    var nativeHolderFull = NativeHolderAdmob("ca-app-pub-3940256099942544/7342230711")
     var interholder = InterHolderAdmob("ca-app-pub-3940256099942544/1033173712")
 
     fun loadInter(context: Context, interHolder: InterHolderAdmob) {
@@ -135,6 +138,25 @@ object AdsManagerAdmod {
 
             }
         })
+    }
+
+    fun showAdsNativeFullScreen(activity: Activity, nativeHolder: NativeHolderAdmob,viewGroup: ViewGroup){
+        AdmobUtils.showNativeFullScreenAdsWithLayout(activity,nativeHolder,viewGroup,
+            R.layout.ad_native_fullscreen,object :
+                AdsNativeCallBackAdmod {
+                override fun NativeLoaded() {
+                    Log.d("==full==", "NativeLoaded: ")
+                }
+
+                override fun NativeFailed(massage: String) {
+                    Log.d("==full==", "NativeFailed: $massage")
+                }
+
+                override fun onPaid(adValue: AdValue?, adUnitAds: String?) {
+
+                }
+
+            })
     }
 
 

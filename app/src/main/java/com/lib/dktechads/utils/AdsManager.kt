@@ -7,6 +7,8 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.MutableLiveData
+import com.admob.max.dktlibrary.AdmobUtils
+import com.admob.max.dktlibrary.AdmobUtils.AdsNativeCallBackAdmod
 import com.admob.max.dktlibrary.AppOpenManager
 import com.admob.max.dktlibrary.ApplovinUtil
 import com.admob.max.dktlibrary.GoogleENative
@@ -15,12 +17,15 @@ import com.admob.max.dktlibrary.callback_applovin.InterstititialCallbackNew
 import com.admob.max.dktlibrary.callback_applovin.NativeCallBackNew
 import com.admob.max.dktlibrary.utils.InterHolder
 import com.admob.max.dktlibrary.utils.NativeHolder
+import com.admob.max.dktlibrary.utils.admod.NativeHolderAdmob
 import com.applovin.mediation.MaxAd
 import com.applovin.mediation.MaxError
 import com.applovin.mediation.ads.MaxInterstitialAd
 import com.applovin.mediation.nativeAds.MaxNativeAdListener
 import com.applovin.mediation.nativeAds.MaxNativeAdLoader
 import com.applovin.mediation.nativeAds.MaxNativeAdView
+import com.google.android.gms.ads.AdValue
+import com.lib.dktechads.R
 
 
 object AdsManager {
@@ -45,6 +50,8 @@ object AdsManager {
                 }
             })
     }
+
+
     fun loadInter(context: Context){
         ApplovinUtil.loadAnGetInterstitials(context, interHolder,object :
             InterstititialCallbackNew {

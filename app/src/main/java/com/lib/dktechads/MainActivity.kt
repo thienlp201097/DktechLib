@@ -28,6 +28,7 @@ import com.applovin.sdk.AppLovinSdkUtils
 import com.google.android.gms.ads.AdSize
 import com.google.android.gms.ads.AdValue
 import com.google.android.gms.ads.AdView
+import com.google.android.gms.ads.MediaAspectRatio
 import com.google.android.gms.ads.nativead.NativeAd
 import com.lib.dktechads.databinding.ActivityMainBinding
 import com.lib.dktechads.utils.AdsManager
@@ -392,6 +393,30 @@ class MainActivity : AppCompatActivity() {
 //
 //                }
 //            })
+
+        AdmobUtils.loadAndGetNativeFullScreenAds(this,AdsManagerAdmod.nativeHolderFull,MediaAspectRatio.ANY,
+            object : AdmobUtils.NativeAdCallbackNew {
+                override fun onLoadedAndGetNativeAd(ad: NativeAd?) {
+                    Log.d("==full==", "Load onNativeAdLoaded: ")
+                }
+
+                override fun onNativeAdLoaded() {
+                    Log.d("==full==", "Load onNativeAdLoaded: ")
+                }
+
+                override fun onAdFail(error: String) {
+                    Log.d("==full==", "Load onAdFail: ")
+                }
+
+                override fun onAdPaid(adValue: AdValue?, adUnitAds: String?) {
+                    
+                }
+
+                override fun onClickAds() {
+                    
+                }
+
+            })
     }
 
     override fun onResume() {

@@ -2006,11 +2006,7 @@ object AdmobUtils {
         if (shimmerFrameLayout != null) {
             shimmerFrameLayout?.stopShimmer()
         }
-        try {
-            viewGroup.removeAllViews()
-        }catch (_: Exception){
-
-        }
+        viewGroup.removeAllViews()
         if (!nativeHolder.isLoad) {
             if (nativeHolder.nativeAd != null) {
                 val adView = activity.layoutInflater.inflate(layout, null) as NativeAdView
@@ -2020,12 +2016,8 @@ object AdmobUtils {
                     shimmerFrameLayout?.stopShimmer()
                 }
                 nativeHolder.native_mutable.removeObservers((activity as LifecycleOwner))
-                try {
-                    viewGroup.addView(adView)
-                    viewGroup.removeAllViews()
-                }catch (_: Exception){
-
-                }
+                viewGroup.removeAllViews()
+                viewGroup.addView(adView)
                 callback.NativeLoaded()
             } else {
                 if (shimmerFrameLayout != null) {
@@ -2036,11 +2028,7 @@ object AdmobUtils {
             }
         } else {
             val tagView = activity.layoutInflater.inflate(R.layout.layoutnative_loading_fullscreen, null, false)
-            try {
-                viewGroup.addView(tagView, 0)
-            }catch (_ : Exception){
-
-            }
+            viewGroup.addView(tagView, 0)
 
             if (shimmerFrameLayout == null) shimmerFrameLayout = tagView.findViewById(R.id.shimmer_view_container)
             shimmerFrameLayout?.startShimmer()
@@ -2054,12 +2042,8 @@ object AdmobUtils {
                     if (shimmerFrameLayout != null) {
                         shimmerFrameLayout?.stopShimmer()
                     }
-                    try {
-                        viewGroup.removeAllViews()
-                        viewGroup.addView(adView)
-                    }catch (_: Exception){
-
-                    }
+                    viewGroup.removeAllViews()
+                    viewGroup.addView(adView)
 
                     callback.NativeLoaded()
                     nativeHolder.native_mutable.removeObservers((activity as LifecycleOwner))
