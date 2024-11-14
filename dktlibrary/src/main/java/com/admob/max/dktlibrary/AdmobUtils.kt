@@ -2042,6 +2042,7 @@ object AdmobUtils {
                     if (shimmerFrameLayout != null) {
                         shimmerFrameLayout?.stopShimmer()
                     }
+
                     viewGroup.removeAllViews()
                     viewGroup.addView(adView)
 
