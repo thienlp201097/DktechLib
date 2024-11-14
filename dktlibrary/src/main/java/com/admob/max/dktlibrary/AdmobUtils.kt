@@ -2037,6 +2037,7 @@ object AdmobUtils {
                     nativeAd.setOnPaidEventListener {
                         AdjustUtils.postRevenueAdjustNative(nativeAd,it, adUnit = nativeHolder.ads)
                     }
+
                     val adView = activity.layoutInflater.inflate(layout, null) as NativeAdView
                     populateNativeAdView(nativeHolder.nativeAd!!,adView.findViewById(R.id.native_ad_view))
                     if (shimmerFrameLayout != null) {
