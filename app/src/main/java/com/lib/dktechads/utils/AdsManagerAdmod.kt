@@ -125,7 +125,7 @@ object AdsManagerAdmod {
             viewGroup.visibility = View.GONE
             return
         }
-        AdmobUtils.showNativeAdsWithLayout(activity, holder, viewGroup, R.layout.ad_unified_medium, GoogleENative.UNIFIED_MEDIUM, object : AdmobUtils.AdsNativeCallBackAdmod {
+        AdmobUtils.showNativeAdsWithLayout(activity, holder, viewGroup, R.layout.ad_unified_medium, GoogleENative.UNIFIED_BANNER, object : AdmobUtils.AdsNativeCallBackAdmod {
             override fun NativeLoaded() {
                 Utils.getInstance().showMessenger(activity, "onNativeShow")
             }
