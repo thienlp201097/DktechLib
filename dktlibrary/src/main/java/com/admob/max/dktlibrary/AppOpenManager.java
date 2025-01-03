@@ -51,6 +51,7 @@ public class AppOpenManager implements Application.ActivityLifecycleCallbacks, L
     public long timeToBackground = 0;
     private long waitingTime = 0;
     private boolean isInitialized = false;
+    private boolean isTestAds = false;
     public boolean isAppResumeEnabled = true;
     private final List<Class> disabledAppOpenList;
     private Class splashActivity;
@@ -87,8 +88,9 @@ public class AppOpenManager implements Application.ActivityLifecycleCallbacks, L
      *
      * @param application
      */
-    public void init(Application application, String appOpenAdId) {
+    public void init(Application application, String appOpenAdId,boolean isTestAds) {
         isInitialized = true;
+        this.isTestAds = isTestAds;
         this.myApplication = application;
         initAdRequest();
         if (AdmobUtils.isTesting) {
@@ -160,6 +162,10 @@ public class AppOpenManager implements Application.ActivityLifecycleCallbacks, L
     boolean isLoading = false;
     public boolean isDismiss = false;
     public void fetchAd(final boolean isSplash) {
+        if (isTestAds){
+            Log.d(TAG, "This is a Test Ads, Ads will not be shown | isTestAds = " + isTestAds);
+            return;
+        }
         Log.d(TAG, "fetchAd: isSplash = " + isSplash);
         if (isAdAvailable(isSplash) || appResumeAdId == null || AppOpenManager.this.appResumeAd!= null) {
             Log.d(TAG, "AppOpenManager: Ad is ready or id = null");
@@ -371,7 +377,10 @@ public class AppOpenManager implements Application.ActivityLifecycleCallbacks, L
                 if (System.currentTimeMillis() - timeToBackground < 30000){
                     return;
                 }
-
+                if (isTestAds){
+                    Log.d(TAG, "This is a Test Ads, Ads will not be shown | isTestAds = " + isTestAds);
+                    return;
+                }
                 if (currentActivity == null) {
                     return;
                 }
