@@ -276,6 +276,10 @@ class MainActivity : AppCompatActivity() {
                     startActivity(Intent(this@MainActivity, MainActivity2::class.java))
                 }
 
+                override fun onClickAds() {
+
+                }
+
                 override fun onPaid(adValue: AdValue?, adUnitAds: String?) {
 
                 }

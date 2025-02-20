@@ -988,6 +988,11 @@ object AdmobUtils {
                                 adCallback?.onAdShowed()
 
                             }
+
+                            override fun onAdClicked() {
+                                super.onAdClicked()
+                                adCallback?.onClickAds()
+                            }
                         }
                         showInterstitialAdNew(activity, aBoolean, adCallback)
                     }, 400)
@@ -1042,6 +1047,11 @@ object AdmobUtils {
                             Log.e("Admodfail", "errorCodeAds" + adError.cause)
                         }
 
+                        override fun onAdClicked() {
+                            super.onAdClicked()
+                            adCallback?.onClickAds()
+                        }
+
                         override fun onAdShowedFullScreenContent() {
                             handler.removeCallbacksAndMessages(null)
                             isAdShowing = true
@@ -1088,6 +1098,7 @@ object AdmobUtils {
 
         }
     }
+
     @JvmStatic
     fun loadAndShowAdRewardWithCallback(
         activity: Activity,
@@ -1767,6 +1778,11 @@ object AdmobUtils {
                                         Handler(Looper.getMainLooper()).postDelayed({
                                             dismissAdDialog()
                                         },800)
+                                    }
+
+                                    override fun onAdClicked() {
+                                        super.onAdClicked()
+                                        adCallback.onClickAds()
                                     }
                                 }
                             if (activity.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED) && mInterstitialAd != null) {

@@ -83,6 +83,10 @@ object AdsManagerAdmod {
                     Utils.getInstance().showMessenger(context, "onAdFail")
                 }
 
+                override fun onClickAds() {
+
+                }
+
                 override fun onPaid(adValue: AdValue?, adUnitAds: String?) {
 
                 }
