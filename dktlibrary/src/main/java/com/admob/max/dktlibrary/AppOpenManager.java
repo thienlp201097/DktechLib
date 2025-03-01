@@ -65,6 +65,9 @@ public class AppOpenManager implements Application.ActivityLifecycleCallbacks, L
         return false;
     });
 
+    public void setTestAds(Boolean isTestAds){
+        this.isTestAds = isTestAds;
+    }
     public void setWaitingTime(long waitingTime){
         this.waitingTime = waitingTime;
     }
@@ -88,9 +91,8 @@ public class AppOpenManager implements Application.ActivityLifecycleCallbacks, L
      *
      * @param application
      */
-    public void init(Application application, String appOpenAdId,boolean isTestAds) {
+    public void init(Application application, String appOpenAdId) {
         isInitialized = true;
-        this.isTestAds = isTestAds;
         this.myApplication = application;
         initAdRequest();
         if (AdmobUtils.isTesting) {
