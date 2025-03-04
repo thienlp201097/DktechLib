@@ -1726,10 +1726,11 @@ object AdmobUtils {
         } else {
             checkIdTest(activity, admobId)
         }
+        val adRequest = AdRequest.Builder().build()
         InterstitialAd.load(
             activity,
             admobId,
-            adRequest!!,
+            adRequest,
             object : InterstitialAdLoadCallback() {
                 override fun onAdLoaded(interstitialAd: InterstitialAd) {
                     super.onAdLoaded(interstitialAd)

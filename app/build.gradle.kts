@@ -9,7 +9,7 @@ android {
 
     defaultConfig {
         applicationId = "com.lib.dktechads"
-        minSdk = 21
+        minSdk = 23
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
@@ -53,6 +53,6 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.core)
     implementation(project (":dktlibrary"))
     implementation("com.applovin:applovin-sdk:13.0.0")
-    implementation("com.google.android.gms:play-services-ads:23.3.0")
+    implementation("com.google.android.gms:play-services-ads:24.0.0")
     implementation("com.google.ads.mediation:applovin:13.0.0.1")
 }
