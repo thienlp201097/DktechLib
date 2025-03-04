@@ -69,7 +69,7 @@ dependencies {
     // Other
     implementation("com.google.code.gson:gson:2.10.1")
     implementation("com.airbnb.android:lottie:6.4.0")
-    implementation("com.google.android.ump:user-messaging-platform:3.0.0")
+    implementation("com.google.android.ump:user-messaging-platform:3.1.0")
 
     //Adjust
     implementation("com.adjust.sdk:adjust-android:5.1.0")
