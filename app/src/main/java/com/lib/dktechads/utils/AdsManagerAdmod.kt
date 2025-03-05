@@ -2,12 +2,16 @@ package com.lib.dktechads.utils
 
 import android.app.Activity
 import android.content.Context
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.MutableLiveData
 import com.admob.max.dktlibrary.AdmobUtils
 import com.admob.max.dktlibrary.AdmobUtils.AdsNativeCallBackAdmod
+import com.admob.max.dktlibrary.AppOpenManager
 import com.admob.max.dktlibrary.GoogleENative
 import com.admob.max.dktlibrary.utils.Utils
 import com.admob.max.dktlibrary.utils.admod.InterHolderAdmob
@@ -163,6 +167,54 @@ object AdsManagerAdmod {
             })
     }
 
+    fun loadAndShowInterSplash(
+        context: Context,
+        interHolder: InterHolderAdmob,
+        callback: AdListener
+    ) {
+
+        AppOpenManager.getInstance().isAppResumeEnabled = true
+        AdmobUtils.loadAndShowAdInterstitial(
+            context as AppCompatActivity,
+            interHolder,
+            object : AdsInterCallBack {
+                override fun onStartAction() {
+
+                }
+
+                override fun onEventClickAdClosed() {
+                    callback.onAdClosed()
+                }
+
+                override fun onAdShowed() {
+                    AppOpenManager.getInstance().isAppResumeEnabled = false
+                    Handler(Looper.getMainLooper()).postDelayed({
+                        try {
+                            AdmobUtils.dismissAdDialog()
+                        } catch (_: Exception) {
+
+                        }
+                    }, 800)
+                }
+
+                override fun onAdLoaded() {
+
+                }
+
+                override fun onAdFail(p0: String?) {
+                    callback.onFailed()
+                }
+
+                override fun onClickAds() {
+
+                }
+
+                override fun onPaid(p0: AdValue?, p1: String?) {
+                }
+            },
+            false
+        )
+    }
 
 
     interface AdListener {

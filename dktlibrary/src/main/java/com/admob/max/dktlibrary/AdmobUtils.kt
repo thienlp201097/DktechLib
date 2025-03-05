@@ -34,11 +34,13 @@ import com.admob.max.dktlibrary.utils.admod.RewardedInterstitialHolderAdmob
 import com.admob.max.dktlibrary.utils.admod.callback.AdCallBackInterLoad
 import com.admob.max.dktlibrary.utils.admod.callback.AdLoadCallback
 import com.admob.max.dktlibrary.utils.admod.callback.AdsInterCallBack
+import com.admob.max.dktlibrary.utils.admod.callback.MobileAdsListener
 import com.admob.max.dktlibrary.utils.admod.callback.NativeAdmobCallback
 import com.admob.max.dktlibrary.utils.admod.callback.NativeFullScreenCallBack
 import com.admob.max.dktlibrary.utils.admod.callback.RewardAdCallback
 import com.admob.max.dktlibrary.utils.admod.remote.BannerPlugin
 import com.airbnb.lottie.LottieAnimationView
+import com.applovin.sdk.AppLovinSdkUtils.runOnUiThread
 import com.facebook.shimmer.ShimmerFrameLayout
 import com.google.ads.mediation.admob.AdMobAdapter
 import com.google.android.gms.ads.AdError
@@ -80,64 +82,61 @@ object AdmobUtils {
     @JvmField
     var dialog: SweetAlertDialog? = null
     var dialogFullScreen: Dialog? = null
+
     // Biến check lần cuối hiển thị quảng cáo
     var lastTimeShowInterstitial: Long = 0
+
     // Timeout init admob
     var timeOut = 0
+
     //Check quảng cáo đang show hay không
     @JvmField
     var isAdShowing = false
     var isClick = false
+
     //Ẩn hiện quảng cáo
     @JvmField
     var isShowAds = true
+
     //Dùng ID Test để hiển thị quảng cáo
     @JvmField
     var isTesting = false
+
     //List device test
     var testDevices: MutableList<String> = ArrayList()
     var deviceId = ""
+
     //Reward Ads
     @JvmField
     var mRewardedAd: RewardedAd? = null
     var mRewardedInterstitialAd: RewardedInterstitialAd? = null
     var mInterstitialAd: InterstitialAd? = null
-    var shimmerFrameLayout: ShimmerFrameLayout?=null
+    var shimmerFrameLayout: ShimmerFrameLayout? = null
+
     //id thật
     var idIntersitialReal: String? = null
     var interIsShowingWithNative = false
     var interIsShowingWithBanner = false
+
     //Hàm Khởi tạo admob
     @JvmStatic
-    fun initAdmob(context: Context?, timeout: Int, isDebug: Boolean, isEnableAds: Boolean) {
-        timeOut = timeout
-        if (timeOut < 5000 && timeout != 0) {
-            Toast.makeText(context, "Nên để limit time ~10000", Toast.LENGTH_LONG).show()
-        }
-        timeOut = if (timeout > 0) {
-            timeout
-        } else {
-            10000
-        }
+    fun initAdmob(
+        context: Context,
+        isDebug: Boolean,
+        isEnableAds: Boolean,
+        mobileAdsListener: MobileAdsListener
+    ) {
         isTesting = isDebug
         isShowAds = isEnableAds
-        MobileAds.initialize(context!!) { initializationStatus: InitializationStatus? -> }
-        initListIdTest()
-        val requestConfiguration = RequestConfiguration.Builder()
-            .setTestDeviceIds(testDevices)
-            .build()
-        MobileAds.setRequestConfiguration(requestConfiguration)
-        initAdRequest(timeout)
+        CoroutineScope(Dispatchers.IO).launch {
+            // Initialize the Google Mobile Ads SDK on a background thread.
+            MobileAds.initialize(context) {}
+            runOnUiThread {
+                mobileAdsListener.onSuccess()
+            }
+        }
     }
 
-    var adRequest: AdRequest? = null
-    // get AdRequest
-    @JvmStatic
-    fun initAdRequest(timeOut: Int) {
-        adRequest = AdRequest.Builder()
-            .setHttpTimeoutMillis(timeOut)
-            .build()
-    }
     fun initListIdTest() {
         testDevices.add("D4A597237D12FDEC52BE6B2F15508BB")
     }
@@ -148,7 +147,7 @@ object AdmobUtils {
         try {
             val cm = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
             return cm.activeNetworkInfo != null && cm.activeNetworkInfo!!.isConnected
-        }catch (e : Exception){
+        } catch (e: Exception) {
             return false
         }
     }
@@ -156,7 +155,7 @@ object AdmobUtils {
     interface BannerCallBack {
         fun onClickAds()
         fun onLoad()
-        fun onFailed(message : String)
+        fun onFailed(message: String)
         fun onPaid(adValue: AdValue?, mAdView: AdView?)
     }
 
@@ -181,18 +180,24 @@ object AdmobUtils {
         val adSize = getAdSize(activity)
         mAdView.setAdSize(adSize)
         val tagView = activity.layoutInflater.inflate(R.layout.layoutbanner_loading, null, false)
+        val adRequest = AdRequest.Builder().build()
 
         try {
             viewGroup.removeAllViews()
             viewGroup.addView(tagView, 0)
             viewGroup.addView(mAdView, 1)
-        }catch (_: Exception){
+        } catch (_: Exception) {
 
         }
         shimmerFrameLayout = tagView.findViewById(R.id.shimmer_view_container)
         shimmerFrameLayout?.startShimmer()
         mAdView.onPaidEventListener =
-            OnPaidEventListener { adValue -> AdjustUtils.postRevenueAdjust(adValue,mAdView.adUnitId) }
+            OnPaidEventListener { adValue ->
+                AdjustUtils.postRevenueAdjust(
+                    adValue,
+                    mAdView.adUnitId
+                )
+            }
         mAdView.adListener = object : AdListener() {
             override fun onAdLoaded() {
                 shimmerFrameLayout?.stopShimmer()
@@ -217,18 +222,19 @@ object AdmobUtils {
                 // to the app after tapping on an ad.
             }
         }
-        if (adRequest != null) {
-            mAdView.loadAd(adRequest!!)
-        }
+        mAdView.loadAd(adRequest)
         Log.e(" Admod", "loadAdBanner")
     }
+
     interface BannerCollapsibleAdCallback {
         fun onClickAds()
         fun onBannerAdLoaded(adSize: AdSize)
-        fun onAdFail(message : String)
+        fun onAdFail(message: String)
         fun onAdPaid(adValue: AdValue, mAdView: AdView)
     }
-    var mAdView :AdView? = null
+
+    var mAdView: AdView? = null
+
     @JvmStatic
     fun loadAdBannerCollapsibleReload(
         activity: Activity,
@@ -256,7 +262,7 @@ object AdmobUtils {
             viewGroup.removeAllViews()
             viewGroup.addView(tagView, 0)
             viewGroup.addView(banner.mAdView, 1)
-        }catch (_: Exception){
+        } catch (_: Exception) {
 
         }
         val adSize = getAdSize(activity)
@@ -267,7 +273,12 @@ object AdmobUtils {
         banner.mAdView?.adListener = object : AdListener() {
             override fun onAdLoaded() {
                 banner.mAdView?.onPaidEventListener =
-                    OnPaidEventListener { adValue -> AdjustUtils.postRevenueAdjust(adValue,banner.mAdView?.adUnitId) }
+                    OnPaidEventListener { adValue ->
+                        AdjustUtils.postRevenueAdjust(
+                            adValue,
+                            banner.mAdView?.adUnitId
+                        )
+                    }
                 shimmerFrameLayout?.stopShimmer()
                 viewGroup.removeView(tagView)
                 callback.onBannerAdLoaded(adSize)
@@ -297,7 +308,8 @@ object AdmobUtils {
             "bottom"
         }
         extras.putString("collapsible", anchored)
-        val adRequest2 = AdRequest.Builder().addNetworkExtrasBundle(AdMobAdapter::class.java, extras).build()
+        val adRequest2 =
+            AdRequest.Builder().addNetworkExtrasBundle(AdMobAdapter::class.java, extras).build()
         banner.mAdView?.loadAd(adRequest2)
         Log.e(" Admod", "loadAdBanner")
     }
@@ -327,7 +339,7 @@ object AdmobUtils {
             viewGroup.removeAllViews()
             viewGroup.addView(tagView, 0)
             viewGroup.addView(mAdView, 1)
-        }catch (_: Exception){
+        } catch (_: Exception) {
 
         }
         shimmerFrameLayout = tagView.findViewById(R.id.shimmer_view_container)
@@ -336,7 +348,12 @@ object AdmobUtils {
         mAdView?.adListener = object : AdListener() {
             override fun onAdLoaded() {
                 mAdView.onPaidEventListener =
-                    OnPaidEventListener { adValue -> AdjustUtils.postRevenueAdjust(adValue,mAdView.adUnitId) }
+                    OnPaidEventListener { adValue ->
+                        AdjustUtils.postRevenueAdjust(
+                            adValue,
+                            mAdView.adUnitId
+                        )
+                    }
                 shimmerFrameLayout?.stopShimmer()
                 viewGroup.removeView(tagView)
                 callback.onBannerAdLoaded(adSize)
@@ -366,7 +383,8 @@ object AdmobUtils {
             "bottom"
         }
         extras.putString("collapsible", anchored)
-        val adRequest2 = AdRequest.Builder().addNetworkExtrasBundle(AdMobAdapter::class.java, extras).build()
+        val adRequest2 =
+            AdRequest.Builder().addNetworkExtrasBundle(AdMobAdapter::class.java, extras).build()
         mAdView.loadAd(adRequest2)
         Log.e(" Admod", "loadAdBanner")
     }
@@ -374,7 +392,11 @@ object AdmobUtils {
     @JvmStatic
     fun loadAndShowBannerCollapsibleWithConfig(
         activity: Activity,
-        id: String, refreshRateSec: Int,cbFetchIntervalSec : Int, view: ViewGroup, size: GoogleEBanner,
+        id: String,
+        refreshRateSec: Int,
+        cbFetchIntervalSec: Int,
+        view: ViewGroup,
+        size: GoogleEBanner,
         bannerAdCallback: BannerCollapsibleAdCallback
     ) {
         var bannerPlugin: BannerPlugin? = null
@@ -383,7 +405,7 @@ object AdmobUtils {
         } else {
             "collapsible_bottom"
         }
-        val bannerConfig = BannerPlugin.BannerConfig(id,type,refreshRateSec,cbFetchIntervalSec)
+        val bannerConfig = BannerPlugin.BannerConfig(id, type, refreshRateSec, cbFetchIntervalSec)
         bannerPlugin = bannerConfig.adUnitId?.let {
             BannerPlugin(
                 activity, view, it, bannerConfig, object : BannerRemoteConfig {
@@ -397,7 +419,7 @@ object AdmobUtils {
                     }
 
                     override fun onAdPaid(adValue: AdValue, mAdView: AdView) {
-                        AdjustUtils.postRevenueAdjust(adValue,mAdView.adUnitId)
+                        AdjustUtils.postRevenueAdjust(adValue, mAdView.adUnitId)
                     }
                 })
         }
@@ -406,7 +428,7 @@ object AdmobUtils {
     @JvmStatic
     fun loadAndShowBannerWithConfig(
         activity: Activity,
-        id: String, refreshRateSec: Int,cbFetchIntervalSec : Int, view: ViewGroup, size: String,
+        id: String, refreshRateSec: Int, cbFetchIntervalSec: Int, view: ViewGroup, size: String,
         bannerAdCallback: BannerCollapsibleAdCallback
     ) {
         var bannerPlugin: BannerPlugin? = null
@@ -427,7 +449,7 @@ object AdmobUtils {
                     }
 
                     override fun onAdPaid(adValue: AdValue, mAdView: AdView) {
-                        AdjustUtils.postRevenueAdjust(adValue,mAdView.adUnitId)
+                        AdjustUtils.postRevenueAdjust(adValue, mAdView.adUnitId)
                     }
                 })
         }
@@ -462,6 +484,7 @@ object AdmobUtils {
             Log.d("===AdsLoadsNative", "Native not null")
             return
         }
+        val adRequest = AdRequest.Builder().build()
         if (isTesting) {
             nativeHolder.ads = context.getString(R.string.test_ads_admob_native_id)
         }
@@ -473,11 +496,15 @@ object AdmobUtils {
                 nativeHolder.nativeAd = nativeAd
                 nativeHolder.isLoad = false
                 nativeHolder.native_mutable.value = nativeAd
-                nativeAd.setOnPaidEventListener { adValue: AdValue? -> adValue?.let {
-                    adCallback.onPaid(adValue,nativeHolder.ads)
-                    AdjustUtils.postRevenueAdjustNative(nativeAd,
-                        it,nativeHolder.ads)
-                } }
+                nativeAd.setOnPaidEventListener { adValue: AdValue? ->
+                    adValue?.let {
+                        adCallback.onPaid(adValue, nativeHolder.ads)
+                        AdjustUtils.postRevenueAdjustNative(
+                            nativeAd,
+                            it, nativeHolder.ads
+                        )
+                    }
+                }
                 adCallback.onLoadedAndGetNativeAd(nativeAd)
             }.withAdListener(object : AdListener() {
                 override fun onAdFailedToLoad(adError: LoadAdError) {
@@ -490,15 +517,14 @@ object AdmobUtils {
                 }
             })
             .withNativeAdOptions(NativeAdOptions.Builder().build()).build()
-        if (adRequest != null) {
-            adLoader.loadAd(adRequest!!)
-        }
+        adLoader.loadAd(adRequest)
+
     }
 
     //Load native 2 in here
     interface AdsNativeCallBackAdmod {
         fun NativeLoaded()
-        fun NativeFailed(massage : String)
+        fun NativeFailed(massage: String)
         fun onPaid(adValue: AdValue?, adUnitAds: String?)
     }
 
@@ -520,7 +546,7 @@ object AdmobUtils {
         }
         try {
             viewGroup.removeAllViews()
-        }catch (_: Exception){
+        } catch (_: Exception) {
 
         }
 
@@ -534,12 +560,12 @@ object AdmobUtils {
                 nativeHolder.native_mutable.removeObservers((activity as LifecycleOwner))
                 try {
                     viewGroup.removeAllViews()
-                }catch (_: Exception){
+                } catch (_: Exception) {
 
                 }
                 try {
                     viewGroup.addView(adView)
-                }catch (_ : Exception){
+                } catch (_: Exception) {
 
                 }
 
@@ -554,24 +580,25 @@ object AdmobUtils {
         } else {
             val tagView: View = if (size === GoogleENative.UNIFIED_MEDIUM) {
                 activity.layoutInflater.inflate(R.layout.layoutnative_loading_medium, null, false)
-            } else if (size === GoogleENative.UNIFIED_SMALL){
+            } else if (size === GoogleENative.UNIFIED_SMALL) {
                 activity.layoutInflater.inflate(R.layout.layoutnative_loading_small, null, false)
-            }else{
+            } else {
                 activity.layoutInflater.inflate(R.layout.layoutbanner_loading, null, false)
             }
             try {
                 viewGroup.addView(tagView, 0)
-            }catch (_ : Exception){
+            } catch (_: Exception) {
 
             }
 
-            if (shimmerFrameLayout == null) shimmerFrameLayout = tagView.findViewById(R.id.shimmer_view_container)
+            if (shimmerFrameLayout == null) shimmerFrameLayout =
+                tagView.findViewById(R.id.shimmer_view_container)
             shimmerFrameLayout?.startShimmer()
             nativeHolder.native_mutable.observe((activity as LifecycleOwner)) { nativeAd: NativeAd? ->
                 if (nativeAd != null) {
                     nativeAd.setOnPaidEventListener {
-                        AdjustUtils.postRevenueAdjustNative(nativeAd,it, nativeHolder.ads)
-                        callback.onPaid(it,nativeHolder.ads)
+                        AdjustUtils.postRevenueAdjustNative(nativeAd, it, nativeHolder.ads)
+                        callback.onPaid(it, nativeHolder.ads)
                     }
                     val adView = activity.layoutInflater.inflate(layout, null) as NativeAdView
                     populateNativeAdView(nativeAd, adView, size)
@@ -581,7 +608,7 @@ object AdmobUtils {
                     try {
                         viewGroup.removeAllViews()
                         viewGroup.addView(adView)
-                    }catch (_: Exception){
+                    } catch (_: Exception) {
 
                     }
 
@@ -599,7 +626,7 @@ object AdmobUtils {
     }
 
     // ads native
-    interface NativeAdCallbackNew{
+    interface NativeAdCallbackNew {
         fun onLoadedAndGetNativeAd(ad: NativeAd?)
         fun onNativeAdLoaded()
         fun onAdFail(error: String)
@@ -625,21 +652,21 @@ object AdmobUtils {
 //            VideoOptions.Builder().setStartMuted(false).build()
         try {
             viewGroup.removeAllViews()
-        }catch (_: Exception){
+        } catch (_: Exception) {
 
         }
         var s = nativeHolder.ads
         val tagView: View = if (size === GoogleENative.UNIFIED_MEDIUM) {
             activity.layoutInflater.inflate(R.layout.layoutnative_loading_medium, null, false)
-        } else if (size === GoogleENative.UNIFIED_SMALL){
+        } else if (size === GoogleENative.UNIFIED_SMALL) {
             activity.layoutInflater.inflate(R.layout.layoutnative_loading_small, null, false)
-        }else{
+        } else {
             activity.layoutInflater.inflate(R.layout.layoutbanner_loading, null, false)
         }
 
         try {
             viewGroup.addView(tagView, 0)
-        }catch (_ : Exception){
+        } catch (_: Exception) {
 
         }
 
@@ -660,13 +687,13 @@ object AdmobUtils {
                 try {
                     viewGroup.removeAllViews()
                     viewGroup.addView(adView)
-                }catch (_: Exception){
+                } catch (_: Exception) {
 
                 }
 
                 nativeAd.setOnPaidEventListener { adValue: AdValue ->
-                    adCallback.onAdPaid(adValue,s)
-                    AdjustUtils.postRevenueAdjustNative(nativeAd,adValue, s)
+                    adCallback.onAdPaid(adValue, s)
+                    AdjustUtils.postRevenueAdjustNative(nativeAd, adValue, s)
                 }
                 //viewGroup.setVisibility(View.VISIBLE);
             }.withAdListener(object : AdListener() {
@@ -676,7 +703,7 @@ object AdmobUtils {
                     shimmerFrameLayout.stopShimmer()
                     try {
                         viewGroup.removeAllViews()
-                    }catch (_: Exception){
+                    } catch (_: Exception) {
 
                     }
                     nativeHolder.isLoad = false
@@ -689,9 +716,8 @@ object AdmobUtils {
                 }
             })
             .withNativeAdOptions(NativeAdOptions.Builder().build()).build()
-        if (adRequest != null) {
-            adLoader.loadAd(adRequest!!)
-        }
+        val adRequest = AdRequest.Builder().build()
+        adLoader.loadAd(adRequest)
         Log.e("Admod", "loadAdNativeAds")
     }
 
@@ -709,11 +735,10 @@ object AdmobUtils {
             viewGroup.visibility = View.GONE
             return
         }
-//        val videoOptions =
-//            VideoOptions.Builder().setStartMuted(false).build()
+        val adRequest = AdRequest.Builder().build()
         try {
             viewGroup.removeAllViews()
-        }catch (_: Exception){
+        } catch (_: Exception) {
 
         }
         var s = nativeHolder.ads
@@ -724,7 +749,7 @@ object AdmobUtils {
         }
         try {
             viewGroup.addView(tagView, 0)
-        }catch (_ : Exception){
+        } catch (_: Exception) {
 
         }
 
@@ -745,13 +770,13 @@ object AdmobUtils {
                 try {
                     viewGroup.removeAllViews()
                     viewGroup.addView(adView)
-                }catch (_: Exception){
+                } catch (_: Exception) {
 
                 }
 
                 nativeAd.setOnPaidEventListener { adValue: AdValue ->
-                    adCallback.onAdPaid(adValue,s)
-                    AdjustUtils.postRevenueAdjustNative(nativeAd,adValue, s)
+                    adCallback.onAdPaid(adValue, s)
+                    AdjustUtils.postRevenueAdjustNative(nativeAd, adValue, s)
                 }
                 //viewGroup.setVisibility(View.VISIBLE);
             }.withAdListener(object : AdListener() {
@@ -761,7 +786,7 @@ object AdmobUtils {
                     shimmerFrameLayout.stopShimmer()
                     try {
                         viewGroup.removeAllViews()
-                    }catch (_: Exception){
+                    } catch (_: Exception) {
 
                     }
                     nativeHolder.isLoad = false
@@ -773,9 +798,7 @@ object AdmobUtils {
                 }
             })
             .withNativeAdOptions(NativeAdOptions.Builder().build()).build()
-        if (adRequest != null) {
-            adLoader.loadAd(adRequest!!)
-        }
+        adLoader.loadAd(adRequest)
     }
 
     @JvmStatic
@@ -792,6 +815,7 @@ object AdmobUtils {
             viewGroup.visibility = View.GONE
             return
         }
+        val adRequest = AdRequest.Builder().build()
         var s = nativeHolder.ads
         if (isTesting) {
             s = activity.getString(R.string.test_ads_admob_native_id)
@@ -805,13 +829,13 @@ object AdmobUtils {
                 try {
                     viewGroup.removeAllViews()
                     viewGroup.addView(adView)
-                }catch (_: Exception){
+                } catch (_: Exception) {
 
                 }
 
                 nativeAd.setOnPaidEventListener { adValue: AdValue ->
-                    AdjustUtils.postRevenueAdjustNative(nativeAd,adValue, s)
-                    adCallback.onAdPaid(adValue,s)
+                    AdjustUtils.postRevenueAdjustNative(nativeAd, adValue, s)
+                    adCallback.onAdPaid(adValue, s)
                 }
                 //viewGroup.setVisibility(View.VISIBLE);
             }.withAdListener(object : AdListener() {
@@ -820,7 +844,7 @@ object AdmobUtils {
                     Log.e("Admodfail", "errorCodeAds" + adError.cause)
                     try {
                         viewGroup.removeAllViews()
-                    }catch (_: Exception){
+                    } catch (_: Exception) {
 
                     }
                     nativeHolder.isLoad = false
@@ -833,9 +857,9 @@ object AdmobUtils {
                 }
             })
             .withNativeAdOptions(NativeAdOptions.Builder().build()).build()
-        if (adRequest != null) {
-            adLoader.loadAd(adRequest!!)
-        }
+
+        adLoader.loadAd(adRequest)
+
         Log.e("Admod", "loadAdNativeAds")
     }
 
@@ -856,9 +880,7 @@ object AdmobUtils {
             return
         }
         interHolder.check = true
-        if (adRequest == null) {
-            initAdRequest(timeOut)
-        }
+        val adRequest = AdRequest.Builder().build()
         if (isTesting) {
             interHolder.ads = activity.getString(R.string.test_ads_admob_inter_id)
         }
@@ -866,7 +888,7 @@ object AdmobUtils {
         InterstitialAd.load(
             activity,
             idIntersitialReal!!,
-            adRequest!!,
+            adRequest,
             object : InterstitialAdLoadCallback() {
                 override fun onAdLoaded(interstitialAd: InterstitialAd) {
                     if (isClick) {
@@ -875,7 +897,8 @@ object AdmobUtils {
                     interHolder.inter = interstitialAd
                     interHolder.check = false
                     interHolder.inter!!.setOnPaidEventListener { adValue ->
-                        AdjustUtils.postRevenueAdjustInter(interHolder.inter!!,
+                        AdjustUtils.postRevenueAdjustInter(
+                            interHolder.inter!!,
                             adValue,
                             interHolder.inter!!.adUnitId
                         )
@@ -996,7 +1019,7 @@ object AdmobUtils {
                         }
                         showInterstitialAdNew(activity, aBoolean, adCallback)
                     }, 400)
-                }else{
+                } else {
                     interHolder.check = true
                 }
             }
@@ -1062,6 +1085,7 @@ object AdmobUtils {
             }, 400)
         }
     }
+
     @JvmStatic
     private fun showInterstitialAdNew(
         activity: Activity,
@@ -1074,7 +1098,7 @@ object AdmobUtils {
                 callback?.onStartAction()
 
                 mInterstitialAd.show(activity)
-            },400)
+            }, 400)
         } else {
             isAdShowing = false
             if (AppOpenManager.getInstance().isInitialized) {
@@ -1094,7 +1118,7 @@ object AdmobUtils {
             if (dialogFullScreen != null && dialogFullScreen?.isShowing == true) {
                 dialogFullScreen?.dismiss()
             }
-        }catch (_: Exception){
+        } catch (_: Exception) {
 
         }
     }
@@ -1113,9 +1137,7 @@ object AdmobUtils {
             adCallback2.onAdClosed()
             return
         }
-        if (adRequest == null) {
-            initAdRequest(timeOut)
-        }
+        val adRequest = AdRequest.Builder().build()
         if (isTesting) {
             admobId = activity.getString(R.string.test_ads_admob_reward_id)
         }
@@ -1127,7 +1149,7 @@ object AdmobUtils {
             AppOpenManager.getInstance().isAppResumeEnabled = false
         }
         RewardedAd.load(activity, admobId!!,
-            adRequest!!, object : RewardedAdLoadCallback() {
+            adRequest, object : RewardedAdLoadCallback() {
                 override fun onAdFailedToLoad(loadAdError: LoadAdError) {
                     // Handle the error.
                     mRewardedAd = null
@@ -1226,9 +1248,7 @@ object AdmobUtils {
             adCallback2.onAdClosed()
             return
         }
-        if (adRequest == null) {
-            initAdRequest(timeOut)
-        }
+        val adRequest = AdRequest.Builder().build()
         if (isTesting) {
             admobId = activity.getString(R.string.test_ads_admob_inter_reward_id)
         }
@@ -1240,7 +1260,7 @@ object AdmobUtils {
             AppOpenManager.getInstance().isAppResumeEnabled = false
         }
         RewardedInterstitialAd.load(activity, admobId!!,
-            adRequest!!, object : RewardedInterstitialAdLoadCallback() {
+            adRequest, object : RewardedInterstitialAdLoadCallback() {
                 override fun onAdFailedToLoad(loadAdError: LoadAdError) {
                     // Handle the error.
                     mRewardedInterstitialAd = null
@@ -1328,6 +1348,7 @@ object AdmobUtils {
     //Interstitial Reward ads
     @JvmField
     var mInterstitialRewardAd: RewardedInterstitialAd? = null
+
     @JvmStatic
     fun loadAdInterstitialReward(
         activity: Context,
@@ -1342,9 +1363,7 @@ object AdmobUtils {
             Log.d("===AdsInter", "mInterstitialRewardAd not null")
             return
         }
-        if (adRequest == null) {
-            initAdRequest(timeOut)
-        }
+        val adRequest = AdRequest.Builder().build()
         mInterstitialRewardAd.isLoading = true
         if (isTesting) {
             admobId = activity.getString(R.string.test_ads_admob_inter_reward_id)
@@ -1352,7 +1371,7 @@ object AdmobUtils {
         RewardedInterstitialAd.load(
             activity,
             admobId,
-            adRequest!!,
+            adRequest,
             object : RewardedInterstitialAdLoadCallback() {
                 override fun onAdLoaded(interstitialRewardAd: RewardedInterstitialAd) {
                     mInterstitialRewardAd.inter = interstitialRewardAd
@@ -1370,14 +1389,12 @@ object AdmobUtils {
                 }
             })
     }
+
     @JvmStatic
     fun showAdInterstitialRewardWithCallback(
-        activity: Activity,mInterstitialRewardAd : RewardedInterstitialHolderAdmob,
+        activity: Activity, mInterstitialRewardAd: RewardedInterstitialHolderAdmob,
         adCallback: RewardAdCallback
     ) {
-        if (adRequest == null) {
-            initAdRequest(timeOut)
-        }
         if (!isShowAds || !isNetworkConnected(activity)) {
             if (AppOpenManager.getInstance().isInitialized) {
                 AppOpenManager.getInstance().isAppResumeEnabled = true
@@ -1397,13 +1414,13 @@ object AdmobUtils {
             }
         }
 
-        CoroutineScope(Dispatchers.IO).launch{
-            withContext(Dispatchers.Main){
-                if (mInterstitialRewardAd.isLoading){
+        CoroutineScope(Dispatchers.IO).launch {
+            withContext(Dispatchers.Main) {
+                if (mInterstitialRewardAd.isLoading) {
                     dialogLoading(activity)
                     delay(800)
 
-                    mInterstitialRewardAd.mutable.observe(activity as LifecycleOwner){reward: RewardedInterstitialAd? ->
+                    mInterstitialRewardAd.mutable.observe(activity as LifecycleOwner) { reward: RewardedInterstitialAd? ->
                         reward?.let {
                             mInterstitialRewardAd.mutable.removeObservers((activity as LifecycleOwner))
                             it.setOnPaidEventListener { value ->
@@ -1412,7 +1429,56 @@ object AdmobUtils {
                                     mInterstitialRewardAd.inter?.adUnitId
                                 )
                             }
-                            mInterstitialRewardAd.inter?.fullScreenContentCallback = object : FullScreenContentCallback() {
+                            mInterstitialRewardAd.inter?.fullScreenContentCallback =
+                                object : FullScreenContentCallback() {
+                                    override fun onAdDismissedFullScreenContent() {
+                                        mInterstitialRewardAd.inter = null
+                                        mInterstitialRewardAd.mutable.removeObservers((activity as LifecycleOwner))
+                                        mInterstitialRewardAd.mutable.value = null
+                                        if (AppOpenManager.getInstance().isInitialized) {
+                                            AppOpenManager.getInstance().isAppResumeEnabled = true
+                                        }
+                                        isAdShowing = false
+                                        dismissAdDialog()
+                                        adCallback.onAdClosed()
+                                        Log.d("TAG", "The ad was dismissed.")
+                                    }
+
+                                    override fun onAdFailedToShowFullScreenContent(adError: AdError) {
+                                        mInterstitialRewardAd.inter = null
+                                        mInterstitialRewardAd.mutable.removeObservers((activity as LifecycleOwner))
+                                        mInterstitialRewardAd.mutable.value = null
+                                        if (AppOpenManager.getInstance().isInitialized) {
+                                            AppOpenManager.getInstance().isAppResumeEnabled = true
+                                        }
+                                        isAdShowing = false
+                                        dismissAdDialog()
+                                        adCallback.onAdFail(adError.message)
+                                        Log.d("TAG", "The ad failed to show.")
+                                    }
+
+                                    override fun onAdShowedFullScreenContent() {
+                                        isAdShowing = true
+                                        adCallback.onAdShowed()
+                                        Handler(Looper.getMainLooper()).postDelayed({
+                                            dismissAdDialog()
+                                        }, 800)
+                                        Log.d("TAG", "The ad was shown.")
+                                    }
+                                }
+                            it.show(activity) { adCallback.onEarned() }
+                        }
+                    }
+                } else {
+                    if (mInterstitialRewardAd.inter != null) {
+                        dialogLoading(activity)
+                        delay(800)
+
+                        mInterstitialRewardAd.inter?.setOnPaidEventListener {
+                            AdjustUtils.postRevenueAdjust(it, mInterstitialRewardAd.inter?.adUnitId)
+                        }
+                        mInterstitialRewardAd.inter?.fullScreenContentCallback =
+                            object : FullScreenContentCallback() {
                                 override fun onAdDismissedFullScreenContent() {
                                     mInterstitialRewardAd.inter = null
                                     mInterstitialRewardAd.mutable.removeObservers((activity as LifecycleOwner))
@@ -1442,56 +1508,9 @@ object AdmobUtils {
                                 override fun onAdShowedFullScreenContent() {
                                     isAdShowing = true
                                     adCallback.onAdShowed()
-                                    Handler(Looper.getMainLooper()).postDelayed({
-                                        dismissAdDialog()
-                                    },800)
                                     Log.d("TAG", "The ad was shown.")
                                 }
                             }
-                            it.show(activity) { adCallback.onEarned() }
-                        }
-                    }
-                }else {
-                    if (mInterstitialRewardAd.inter != null) {
-                        dialogLoading(activity)
-                        delay(800)
-
-                        mInterstitialRewardAd.inter?.setOnPaidEventListener {
-                            AdjustUtils.postRevenueAdjust(it, mInterstitialRewardAd.inter?.adUnitId)
-                        }
-                        mInterstitialRewardAd.inter?.fullScreenContentCallback = object : FullScreenContentCallback() {
-                            override fun onAdDismissedFullScreenContent() {
-                                mInterstitialRewardAd.inter = null
-                                mInterstitialRewardAd.mutable.removeObservers((activity as LifecycleOwner))
-                                mInterstitialRewardAd.mutable.value = null
-                                if (AppOpenManager.getInstance().isInitialized) {
-                                    AppOpenManager.getInstance().isAppResumeEnabled = true
-                                }
-                                isAdShowing = false
-                                dismissAdDialog()
-                                adCallback.onAdClosed()
-                                Log.d("TAG", "The ad was dismissed.")
-                            }
-
-                            override fun onAdFailedToShowFullScreenContent(adError: AdError) {
-                                mInterstitialRewardAd.inter = null
-                                mInterstitialRewardAd.mutable.removeObservers((activity as LifecycleOwner))
-                                mInterstitialRewardAd.mutable.value = null
-                                if (AppOpenManager.getInstance().isInitialized) {
-                                    AppOpenManager.getInstance().isAppResumeEnabled = true
-                                }
-                                isAdShowing = false
-                                dismissAdDialog()
-                                adCallback.onAdFail(adError.message)
-                                Log.d("TAG", "The ad failed to show.")
-                            }
-
-                            override fun onAdShowedFullScreenContent() {
-                                isAdShowing = true
-                                adCallback.onAdShowed()
-                                Log.d("TAG", "The ad was shown.")
-                            }
-                        }
                         mInterstitialRewardAd.inter?.show(activity) { adCallback.onEarned() }
 
                     } else {
@@ -1523,9 +1542,7 @@ object AdmobUtils {
             Log.d("===AdsInter", "mInterstitialRewardAd not null")
             return
         }
-        if (adRequest == null) {
-            initAdRequest(timeOut)
-        }
+        val adRequest = AdRequest.Builder().build()
         mInterstitialRewardAd.isLoading = true
         if (isTesting) {
             admobId = activity.getString(R.string.test_ads_admob_reward_id)
@@ -1533,7 +1550,7 @@ object AdmobUtils {
         RewardedAd.load(
             activity,
             admobId,
-            adRequest!!,
+            adRequest,
             object : RewardedAdLoadCallback() {
                 override fun onAdLoaded(interstitialRewardAd: RewardedAd) {
                     mInterstitialRewardAd.inter = interstitialRewardAd
@@ -1551,14 +1568,12 @@ object AdmobUtils {
                 }
             })
     }
+
     @JvmStatic
     fun showAdRewardWithCallback(
-        activity: Activity,mInterstitialRewardAd : RewardHolderAdmob,
+        activity: Activity, mInterstitialRewardAd: RewardHolderAdmob,
         adCallback: RewardAdCallback
     ) {
-        if (adRequest == null) {
-            initAdRequest(timeOut)
-        }
         if (!isShowAds || !isNetworkConnected(activity)) {
             if (AppOpenManager.getInstance().isInitialized) {
                 AppOpenManager.getInstance().isAppResumeEnabled = true
@@ -1578,13 +1593,13 @@ object AdmobUtils {
             }
         }
 
-        CoroutineScope(Dispatchers.Main).launch{
-            withContext(Dispatchers.Main){
-                if (mInterstitialRewardAd.isLoading){
+        CoroutineScope(Dispatchers.Main).launch {
+            withContext(Dispatchers.Main) {
+                if (mInterstitialRewardAd.isLoading) {
                     dialogLoading(activity)
                     delay(800)
 
-                    mInterstitialRewardAd.mutable.observe(activity as LifecycleOwner){reward: RewardedAd? ->
+                    mInterstitialRewardAd.mutable.observe(activity as LifecycleOwner) { reward: RewardedAd? ->
                         reward?.let {
                             mInterstitialRewardAd.mutable.removeObservers((activity as LifecycleOwner))
                             it.setOnPaidEventListener { value ->
@@ -1593,7 +1608,56 @@ object AdmobUtils {
                                     mInterstitialRewardAd.inter?.adUnitId
                                 )
                             }
-                            mInterstitialRewardAd.inter?.fullScreenContentCallback = object : FullScreenContentCallback() {
+                            mInterstitialRewardAd.inter?.fullScreenContentCallback =
+                                object : FullScreenContentCallback() {
+                                    override fun onAdDismissedFullScreenContent() {
+                                        mInterstitialRewardAd.inter = null
+                                        mInterstitialRewardAd.mutable.removeObservers((activity as LifecycleOwner))
+                                        mInterstitialRewardAd.mutable.value = null
+                                        if (AppOpenManager.getInstance().isInitialized) {
+                                            AppOpenManager.getInstance().isAppResumeEnabled = true
+                                        }
+                                        isAdShowing = false
+                                        dismissAdDialog()
+                                        adCallback.onAdClosed()
+                                        Log.d("TAG", "The ad was dismissed.")
+                                    }
+
+                                    override fun onAdFailedToShowFullScreenContent(adError: AdError) {
+                                        mInterstitialRewardAd.inter = null
+                                        mInterstitialRewardAd.mutable.removeObservers((activity as LifecycleOwner))
+                                        mInterstitialRewardAd.mutable.value = null
+                                        if (AppOpenManager.getInstance().isInitialized) {
+                                            AppOpenManager.getInstance().isAppResumeEnabled = true
+                                        }
+                                        isAdShowing = false
+                                        dismissAdDialog()
+                                        adCallback.onAdFail(adError.message)
+                                        Log.d("TAG", "The ad failed to show.")
+                                    }
+
+                                    override fun onAdShowedFullScreenContent() {
+                                        isAdShowing = true
+                                        adCallback.onAdShowed()
+                                        Handler(Looper.getMainLooper()).postDelayed({
+                                            dismissAdDialog()
+                                        }, 800)
+                                        Log.d("TAG", "The ad was shown.")
+                                    }
+                                }
+                            it.show(activity) { adCallback.onEarned() }
+                        }
+                    }
+                } else {
+                    if (mInterstitialRewardAd.inter != null) {
+                        dialogLoading(activity)
+                        delay(800)
+
+                        mInterstitialRewardAd.inter?.setOnPaidEventListener {
+                            AdjustUtils.postRevenueAdjust(it, mInterstitialRewardAd.inter?.adUnitId)
+                        }
+                        mInterstitialRewardAd.inter?.fullScreenContentCallback =
+                            object : FullScreenContentCallback() {
                                 override fun onAdDismissedFullScreenContent() {
                                     mInterstitialRewardAd.inter = null
                                     mInterstitialRewardAd.mutable.removeObservers((activity as LifecycleOwner))
@@ -1623,56 +1687,9 @@ object AdmobUtils {
                                 override fun onAdShowedFullScreenContent() {
                                     isAdShowing = true
                                     adCallback.onAdShowed()
-                                    Handler(Looper.getMainLooper()).postDelayed({
-                                        dismissAdDialog()
-                                    },800)
                                     Log.d("TAG", "The ad was shown.")
                                 }
                             }
-                            it.show(activity) { adCallback.onEarned() }
-                        }
-                    }
-                }else {
-                    if (mInterstitialRewardAd.inter != null) {
-                        dialogLoading(activity)
-                        delay(800)
-
-                        mInterstitialRewardAd.inter?.setOnPaidEventListener {
-                            AdjustUtils.postRevenueAdjust(it, mInterstitialRewardAd.inter?.adUnitId)
-                        }
-                        mInterstitialRewardAd.inter?.fullScreenContentCallback = object : FullScreenContentCallback() {
-                            override fun onAdDismissedFullScreenContent() {
-                                mInterstitialRewardAd.inter = null
-                                mInterstitialRewardAd.mutable.removeObservers((activity as LifecycleOwner))
-                                mInterstitialRewardAd.mutable.value = null
-                                if (AppOpenManager.getInstance().isInitialized) {
-                                    AppOpenManager.getInstance().isAppResumeEnabled = true
-                                }
-                                isAdShowing = false
-                                dismissAdDialog()
-                                adCallback.onAdClosed()
-                                Log.d("TAG", "The ad was dismissed.")
-                            }
-
-                            override fun onAdFailedToShowFullScreenContent(adError: AdError) {
-                                mInterstitialRewardAd.inter = null
-                                mInterstitialRewardAd.mutable.removeObservers((activity as LifecycleOwner))
-                                mInterstitialRewardAd.mutable.value = null
-                                if (AppOpenManager.getInstance().isInitialized) {
-                                    AppOpenManager.getInstance().isAppResumeEnabled = true
-                                }
-                                isAdShowing = false
-                                dismissAdDialog()
-                                adCallback.onAdFail(adError.message)
-                                Log.d("TAG", "The ad failed to show.")
-                            }
-
-                            override fun onAdShowedFullScreenContent() {
-                                isAdShowing = true
-                                adCallback.onAdShowed()
-                                Log.d("TAG", "The ad was shown.")
-                            }
-                        }
                         mInterstitialRewardAd.inter?.show(activity) { adCallback.onEarned() }
 
                     } else {
@@ -1700,9 +1717,7 @@ object AdmobUtils {
         var admobId = admobId.ads
         mInterstitialAd = null
         isAdShowing = false
-        if (adRequest == null) {
-            initAdRequest(timeOut)
-        }
+
         if (!isShowAds || !isNetworkConnected(activity)) {
             adCallback.onAdFail("No internet")
             return
@@ -1717,6 +1732,7 @@ object AdmobUtils {
                 }
             }
         }
+        val adRequest = AdRequest.Builder().build()
 
         if (enableLoadingDialog) {
             dialogLoading(activity)
@@ -1726,7 +1742,6 @@ object AdmobUtils {
         } else {
             checkIdTest(activity, admobId)
         }
-        val adRequest = AdRequest.Builder().build()
         InterstitialAd.load(
             activity,
             admobId,
@@ -1739,10 +1754,14 @@ object AdmobUtils {
                         mInterstitialAd = interstitialAd
                         if (mInterstitialAd != null) {
                             mInterstitialAd!!.onPaidEventListener =
-                                OnPaidEventListener { adValue: AdValue? -> adValue?.let {
-                                    AdjustUtils.postRevenueAdjustInter(mInterstitialAd!!,
-                                        it, mInterstitialAd!!.adUnitId)
-                                } }
+                                OnPaidEventListener { adValue: AdValue? ->
+                                    adValue?.let {
+                                        AdjustUtils.postRevenueAdjustInter(
+                                            mInterstitialAd!!,
+                                            it, mInterstitialAd!!.adUnitId
+                                        )
+                                    }
+                                }
                             mInterstitialAd!!.fullScreenContentCallback =
                                 object : FullScreenContentCallback() {
                                     override fun onAdFailedToShowFullScreenContent(adError: AdError) {
@@ -1778,7 +1797,7 @@ object AdmobUtils {
                                         adCallback.onAdShowed()
                                         Handler(Looper.getMainLooper()).postDelayed({
                                             dismissAdDialog()
-                                        },800)
+                                        }, 800)
                                     }
 
                                     override fun onAdClicked() {
@@ -1853,7 +1872,6 @@ object AdmobUtils {
     }
 
 
-
     fun md5(s: String): String {
         try {
             // Create MD5 Hash
@@ -1892,32 +1910,44 @@ object AdmobUtils {
         }
 
     }
-    fun loadAndShowNativeFullScreen(activity: Activity,id : String, viewGroup: ViewGroup,layout: Int,mediaAspectRatio : Int, listener: NativeFullScreenCallBack){
+
+    fun loadAndShowNativeFullScreen(
+        activity: Activity,
+        id: String,
+        viewGroup: ViewGroup,
+        layout: Int,
+        mediaAspectRatio: Int,
+        listener: NativeFullScreenCallBack
+    ) {
         if (!isShowAds || !isNetworkConnected(activity)) {
             viewGroup.visibility = View.GONE
             return
         }
-        var adMobId : String = id
+        var adMobId: String = id
         if (isTesting) {
             adMobId = activity.getString(R.string.test_ads_admob_native_full_screen_id)
         }
+
+        val adRequest = AdRequest.Builder().build()
         try {
             viewGroup.removeAllViews()
-        }catch (_: Exception){
+        } catch (_: Exception) {
 
         }
-        val tagView = activity.layoutInflater.inflate(R.layout.layoutnative_loading_fullscreen, null, false)
+        val tagView =
+            activity.layoutInflater.inflate(R.layout.layoutnative_loading_fullscreen, null, false)
         try {
-            viewGroup.addView(tagView,0)
-        }catch (_ : Exception){
+            viewGroup.addView(tagView, 0)
+        } catch (_: Exception) {
 
         }
 
         shimmerFrameLayout = tagView.findViewById(R.id.shimmer_view_container)
         shimmerFrameLayout?.startShimmer()
         val adView = activity.layoutInflater.inflate(layout, null) as NativeAdView
-        val builder = AdLoader.Builder(activity,adMobId)
-        val videoOptions = VideoOptions.Builder().setStartMuted(false).setCustomControlsRequested(false).build()
+        val builder = AdLoader.Builder(activity, adMobId)
+        val videoOptions =
+            VideoOptions.Builder().setStartMuted(false).setCustomControlsRequested(false).build()
         val adOptions = NativeAdOptions.Builder()
             .setMediaAspectRatio(mediaAspectRatio)
             .setVideoOptions(videoOptions)
@@ -1926,19 +1956,20 @@ object AdmobUtils {
         builder.forNativeAd { nativeAd ->
             nativeAd.setOnPaidEventListener { adValue: AdValue? ->
                 adValue?.let {
-                    AdjustUtils.postRevenueAdjustNative(nativeAd,it, adUnit = id) }
+                    AdjustUtils.postRevenueAdjustNative(nativeAd, it, adUnit = id)
+                }
             }
             listener.onLoaded(nativeAd)
-            populateNativeAdView(nativeAd,adView.findViewById(R.id.native_ad_view))
+            populateNativeAdView(nativeAd, adView.findViewById(R.id.native_ad_view))
             try {
                 viewGroup.removeAllViews()
-            }catch (_: Exception){
+            } catch (_: Exception) {
 
             }
             shimmerFrameLayout?.stopShimmer()
             try {
                 viewGroup.addView(adView)
-            }catch (_ : Exception){
+            } catch (_: Exception) {
 
             }
 
@@ -1950,15 +1981,15 @@ object AdmobUtils {
                 listener.onLoadFailed()
             }
         })
-        if (adRequest != null) {
-            builder.build().loadAd(adRequest!!)
-        }
+
+        builder.build().loadAd(adRequest)
+
     }
 
     @JvmStatic
     fun loadAndGetNativeFullScreenAds(
         context: Context,
-        nativeHolder: NativeHolderAdmob, mediaAspectRatio : Int,
+        nativeHolder: NativeHolderAdmob, mediaAspectRatio: Int,
         adCallback: NativeAdCallbackNew
     ) {
         if (!isShowAds || !isNetworkConnected(context)) {
@@ -1970,11 +2001,13 @@ object AdmobUtils {
             Log.d("===AdsLoadsNative", "Native not null")
             return
         }
+        val adRequest = AdRequest.Builder().build()
         if (isTesting) {
             nativeHolder.ads = context.getString(R.string.test_ads_admob_native_full_screen_id)
         }
         nativeHolder.isLoad = true
-        val videoOptions = VideoOptions.Builder().setStartMuted(false).setCustomControlsRequested(true).build()
+        val videoOptions =
+            VideoOptions.Builder().setStartMuted(false).setCustomControlsRequested(true).build()
         val adOptions = NativeAdOptions.Builder()
             .setMediaAspectRatio(mediaAspectRatio)
             .setVideoOptions(videoOptions)
@@ -1985,9 +2018,11 @@ object AdmobUtils {
             nativeHolder.nativeAd = nativeAd
             nativeHolder.isLoad = false
             nativeHolder.native_mutable.value = nativeAd
-            nativeAd.setOnPaidEventListener { adValue: AdValue? -> adValue?.let {
-                AdjustUtils.postRevenueAdjustNative(nativeAd,it, adUnit = nativeHolder.ads)
-            } }
+            nativeAd.setOnPaidEventListener { adValue: AdValue? ->
+                adValue?.let {
+                    AdjustUtils.postRevenueAdjustNative(nativeAd, it, adUnit = nativeHolder.ads)
+                }
+            }
             adCallback.onLoadedAndGetNativeAd(nativeAd)
         }
         adLoader.withAdListener(object : AdListener() {
@@ -1997,7 +2032,7 @@ object AdmobUtils {
                 nativeHolder.nativeAd = null
                 nativeHolder.isLoad = false
                 nativeHolder.native_mutable.value = null
-                adCallback.onAdFail("errorId2_"+adError.message)
+                adCallback.onAdFail("errorId2_" + adError.message)
             }
 
             override fun onAdClicked() {
@@ -2005,9 +2040,7 @@ object AdmobUtils {
                 adCallback.onClickAds()
             }
         })
-        if (adRequest != null) {
-            adLoader.build().loadAd(adRequest!!)
-        }
+        adLoader.build().loadAd(adRequest)
     }
 
     @JvmStatic
@@ -2029,7 +2062,10 @@ object AdmobUtils {
         if (!nativeHolder.isLoad) {
             if (nativeHolder.nativeAd != null) {
                 val adView = activity.layoutInflater.inflate(layout, null) as NativeAdView
-                populateNativeAdView(nativeHolder.nativeAd!!,adView.findViewById(R.id.native_ad_view))
+                populateNativeAdView(
+                    nativeHolder.nativeAd!!,
+                    adView.findViewById(R.id.native_ad_view)
+                )
                 shimmerFrameLayout?.stopShimmer()
                 if (shimmerFrameLayout != null) {
                     shimmerFrameLayout?.stopShimmer()
@@ -2046,19 +2082,27 @@ object AdmobUtils {
                 callback.NativeFailed("None Show")
             }
         } else {
-            val tagView = activity.layoutInflater.inflate(R.layout.layoutnative_loading_fullscreen, null, false)
+            val tagView = activity.layoutInflater.inflate(
+                R.layout.layoutnative_loading_fullscreen,
+                null,
+                false
+            )
             viewGroup.addView(tagView, 0)
 
-            if (shimmerFrameLayout == null) shimmerFrameLayout = tagView.findViewById(R.id.shimmer_view_container)
+            if (shimmerFrameLayout == null) shimmerFrameLayout =
+                tagView.findViewById(R.id.shimmer_view_container)
             shimmerFrameLayout?.startShimmer()
             nativeHolder.native_mutable.observe((activity as LifecycleOwner)) { nativeAd: NativeAd? ->
                 if (nativeAd != null) {
                     nativeAd.setOnPaidEventListener {
-                        AdjustUtils.postRevenueAdjustNative(nativeAd,it, adUnit = nativeHolder.ads)
+                        AdjustUtils.postRevenueAdjustNative(nativeAd, it, adUnit = nativeHolder.ads)
                     }
 
                     val adView = activity.layoutInflater.inflate(layout, null) as NativeAdView
-                    populateNativeAdView(nativeHolder.nativeAd!!,adView.findViewById(R.id.native_ad_view))
+                    populateNativeAdView(
+                        nativeHolder.nativeAd!!,
+                        adView.findViewById(R.id.native_ad_view)
+                    )
                     if (shimmerFrameLayout != null) {
                         shimmerFrameLayout?.stopShimmer()
                     }
@@ -2079,18 +2123,27 @@ object AdmobUtils {
         }
     }
 
-    fun loadAndShowNativeFullScreenNoShimmer(activity: Activity,id : String, viewGroup: ViewGroup,layout: Int,mediaAspectRatio : Int, listener: NativeFullScreenCallBack){
+    fun loadAndShowNativeFullScreenNoShimmer(
+        activity: Activity,
+        id: String,
+        viewGroup: ViewGroup,
+        layout: Int,
+        mediaAspectRatio: Int,
+        listener: NativeFullScreenCallBack
+    ) {
         if (!isShowAds || !isNetworkConnected(activity)) {
             viewGroup.visibility = View.GONE
             return
         }
-        var adMobId : String = id
+        val adRequest = AdRequest.Builder().build()
+        var adMobId: String = id
         if (isTesting) {
             adMobId = activity.getString(R.string.test_ads_admob_native_full_screen_id)
         }
         val adView = activity.layoutInflater.inflate(layout, null) as NativeAdView
-        val builder = AdLoader.Builder(activity,adMobId)
-        val videoOptions = VideoOptions.Builder().setStartMuted(false).setCustomControlsRequested(false).build()
+        val builder = AdLoader.Builder(activity, adMobId)
+        val videoOptions =
+            VideoOptions.Builder().setStartMuted(false).setCustomControlsRequested(false).build()
         val adOptions = NativeAdOptions.Builder()
             .setMediaAspectRatio(mediaAspectRatio)
             .setVideoOptions(videoOptions)
@@ -2100,17 +2153,18 @@ object AdmobUtils {
             listener.onLoaded(nativeAd)
             nativeAd.setOnPaidEventListener { adValue: AdValue? ->
                 adValue?.let {
-                    AdjustUtils.postRevenueAdjustNative(nativeAd,
+                    AdjustUtils.postRevenueAdjustNative(
+                        nativeAd,
                         adValue,
                         id
                     )
                 }
             }
-            populateNativeAdView(nativeAd,adView.findViewById(R.id.native_ad_view))
+            populateNativeAdView(nativeAd, adView.findViewById(R.id.native_ad_view))
             try {
                 viewGroup.removeAllViews()
                 viewGroup.addView(adView)
-            }catch (_: Exception){
+            } catch (_: Exception) {
 
             }
 
@@ -2121,9 +2175,9 @@ object AdmobUtils {
                 listener.onLoadFailed()
             }
         })
-        if (adRequest != null) {
-            builder.build().loadAd(adRequest!!)
-        }
+
+        builder.build().loadAd(adRequest)
+
     }
 
     @JvmStatic
@@ -2144,9 +2198,10 @@ object AdmobUtils {
 //            VideoOptions.Builder().setStartMuted(false).build()
         try {
             viewGroup.removeAllViews()
-        }catch (_ : Exception){
+        } catch (_: Exception) {
 
         }
+        val adRequest = AdRequest.Builder().build()
 
         var s = nativeHolder.ads
         val tagView: View = if (size === GoogleENative.UNIFIED_MEDIUM) {
@@ -2156,7 +2211,7 @@ object AdmobUtils {
         }
         try {
             viewGroup.addView(tagView, 0)
-        }catch (_ : Exception){
+        } catch (_: Exception) {
 
         }
 
@@ -2177,11 +2232,11 @@ object AdmobUtils {
                 try {
                     viewGroup.removeAllViews()
                     viewGroup.addView(adView)
-                }catch (_ : Exception){
+                } catch (_: Exception) {
 
                 }
                 nativeAd.setOnPaidEventListener { adValue: AdValue ->
-                    adCallback.onAdPaid(adValue,s)
+                    adCallback.onAdPaid(adValue, s)
                 }
                 //viewGroup.setVisibility(View.VISIBLE);
             }.withAdListener(object : AdListener() {
@@ -2191,7 +2246,7 @@ object AdmobUtils {
                     shimmerFrameLayout.stopShimmer()
                     try {
                         viewGroup.removeAllViews()
-                    }catch (_ : Exception){
+                    } catch (_: Exception) {
 
                     }
                     nativeHolder.isLoad = false
@@ -2204,9 +2259,8 @@ object AdmobUtils {
                 }
             })
             .withNativeAdOptions(NativeAdOptions.Builder().build()).build()
-        if (adRequest != null) {
-            adLoader.loadAd(adRequest!!)
-        }
+        adLoader.loadAd(adRequest)
+
         Log.e("Admod", "loadAdNativeAds")
     }
 
@@ -2228,7 +2282,7 @@ object AdmobUtils {
         }
         try {
             viewGroup.removeAllViews()
-        }catch (_ : Exception){
+        } catch (_: Exception) {
 
         }
         if (!nativeHolder.isLoad) {
@@ -2242,7 +2296,7 @@ object AdmobUtils {
                 try {
                     viewGroup.removeAllViews()
                     viewGroup.addView(adView)
-                }catch (_ : Exception){
+                } catch (_: Exception) {
 
                 }
                 callback.NativeLoaded()
@@ -2261,7 +2315,7 @@ object AdmobUtils {
             }
             try {
                 viewGroup.addView(tagView, 0)
-            }catch (_ : Exception){
+            } catch (_: Exception) {
 
             }
 
@@ -2271,8 +2325,8 @@ object AdmobUtils {
             nativeHolder.native_mutable.observe((activity as LifecycleOwner)) { nativeAd: NativeAd? ->
                 if (nativeAd != null) {
                     nativeAd.setOnPaidEventListener {
-                        AdjustUtils.postRevenueAdjustNative(nativeAd,it,nativeHolder.ads)
-                        callback.onPaid(it,nativeHolder.ads)
+                        AdjustUtils.postRevenueAdjustNative(nativeAd, it, nativeHolder.ads)
+                        callback.onPaid(it, nativeHolder.ads)
                     }
                     val adView = activity.layoutInflater.inflate(layout, null) as NativeAdView
                     populateNativeAdViewNoBtn(nativeAd, adView, size)
@@ -2282,7 +2336,7 @@ object AdmobUtils {
                     try {
                         viewGroup.removeAllViews()
                         viewGroup.addView(adView)
-                    }catch (_ : Exception){
+                    } catch (_: Exception) {
 
                     }
                     callback.NativeLoaded()
