@@ -49,7 +49,7 @@ public class AppOpenManager implements Application.ActivityLifecycleCallbacks, L
     private long splashLoadTime = 0;
     private int splashTimeout = 0;
     public long timeToBackground = 0;
-    private long waitingTime = 0;
+    private long waitingTime = 30000L;
     private boolean isInitialized = false;
     private boolean isTestAds = false;
     public boolean isAppResumeEnabled = true;
@@ -58,6 +58,7 @@ public class AppOpenManager implements Application.ActivityLifecycleCallbacks, L
     private boolean isTimeout = false;
     private static final int TIMEOUT_MSG = 11;
     private Dialog dialogFullScreen;
+
     private Handler timeoutHandler = new Handler(msg -> {
         if (msg.what == TIMEOUT_MSG) {
             isTimeout = true;
@@ -376,7 +377,7 @@ public class AppOpenManager implements Application.ActivityLifecycleCallbacks, L
             public void run() {
                 Log.d("===OnStart", (System.currentTimeMillis() - timeToBackground) + "");
 
-                if (System.currentTimeMillis() - timeToBackground < 30000){
+                if (System.currentTimeMillis() - timeToBackground < waitingTime){
                     return;
                 }
                 if (isTestAds){
