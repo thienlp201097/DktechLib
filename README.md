@@ -21,6 +21,16 @@ plugins {
     id("com.google.gms.google-services")                     // 🔧 Google Services (required)
     alias(libs.plugins.google.firebase.crashlytics)          // Optional: for Crashlytics
 }
+```
+
+Call in app:
+```
+ FireBaseConfig.initRemoteConfig(R.xml.remote_config_defaults,object : FireBaseConfig.CompleteListener{
+            override fun onComplete() {
+                FireBaseConfig.getValue("test")
+                
+            }
+        })
 
 
   
