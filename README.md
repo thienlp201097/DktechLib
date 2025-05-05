@@ -19,6 +19,18 @@
  AppOpenManager.getInstance().init(application, "your-id")
  AppOpenManager.getInstance().disableAppResumeWithActivity(SplashActivity::class.java)
 
+ //FireBase 
+ plugins {
+  ...
+    id("com.google.gms.google-services") version "4.4.2" apply false
+    alias(libs.plugins.google.firebase.crashlytics) apply false
+}
+//In Module: app
+plugins {
+...
+    id("com.google.gms.google-services")
+    alias(libs.plugins.google.firebase.crashlytics)
+}
 
 
   
