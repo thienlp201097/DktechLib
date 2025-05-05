@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "274068418266",
+    "project_id": "dktech-lib",
+    "storage_bucket": "dktech-lib.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:274068418266:android:bd6d96604368b095507fe3",
+        "android_client_info": {
+          "package_name": "com.lib.dktechads"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB-m1IY6U4eQSwmkdB2XIKZU8QuNM19GF8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

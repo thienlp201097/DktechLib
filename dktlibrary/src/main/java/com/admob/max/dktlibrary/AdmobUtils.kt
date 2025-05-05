@@ -902,6 +902,7 @@ object AdmobUtils {
                             adValue,
                             interHolder.inter!!.adUnitId
                         )
+                        Log.d("==Advalue==", "onAdLoaded:  ${interHolder.inter!!.responseInfo}")
                         adLoadCallback.onPaid(adValue, interHolder.inter!!.adUnitId)
                     }
                     adLoadCallback.onAdLoaded(interstitialAd, false)
@@ -1006,6 +1007,10 @@ object AdmobUtils {
                             }
 
                             override fun onAdShowedFullScreenContent() {
+                                val responseInfo = aBoolean.responseInfo
+                                val mediationAdapter = responseInfo.mediationAdapterClassName
+                                Log.d("AdMob", "Ad from: $mediationAdapter")
+
                                 handler.removeCallbacksAndMessages(null)
                                 isAdShowing = true
                                 adCallback?.onAdShowed()
@@ -1710,136 +1715,116 @@ object AdmobUtils {
     @JvmStatic
     fun loadAndShowAdInterstitial(
         activity: AppCompatActivity,
-        admobId: InterHolderAdmob,
+        admobHolder: InterHolderAdmob,
         adCallback: AdsInterCallBack,
         enableLoadingDialog: Boolean
     ) {
-        var admobId = admobId.ads
+        var admobId = admobHolder.ads
         mInterstitialAd = null
         isAdShowing = false
+
+        val appOpenManager = AppOpenManager.getInstance()
 
         if (!isShowAds || !isNetworkConnected(activity)) {
             adCallback.onAdFail("No internet")
             return
         }
-        if (AppOpenManager.getInstance().isInitialized) {
-            if (!AppOpenManager.getInstance().isAppResumeEnabled) {
-                return
-            } else {
-                isAdShowing = false
-                if (AppOpenManager.getInstance().isInitialized) {
-                    AppOpenManager.getInstance().isAppResumeEnabled = false
-                }
-            }
+
+        if (appOpenManager.isInitialized && !appOpenManager.isAppResumeEnabled) {
+            return
+        } else if (appOpenManager.isInitialized) {
+            appOpenManager.isAppResumeEnabled = false
         }
-        val adRequest = AdRequest.Builder().build()
 
         if (enableLoadingDialog) {
             dialogLoading(activity)
         }
+
         if (isTesting) {
             admobId = activity.getString(R.string.test_ads_admob_inter_id)
         } else {
             checkIdTest(activity, admobId)
         }
-        InterstitialAd.load(
-            activity,
-            admobId,
-            adRequest,
-            object : InterstitialAdLoadCallback() {
-                override fun onAdLoaded(interstitialAd: InterstitialAd) {
-                    super.onAdLoaded(interstitialAd)
-                    adCallback.onAdLoaded()
-                    Handler(Looper.getMainLooper()).postDelayed({
-                        mInterstitialAd = interstitialAd
-                        if (mInterstitialAd != null) {
-                            mInterstitialAd!!.onPaidEventListener =
-                                OnPaidEventListener { adValue: AdValue? ->
-                                    adValue?.let {
-                                        AdjustUtils.postRevenueAdjustInter(
-                                            mInterstitialAd!!,
-                                            it, mInterstitialAd!!.adUnitId
-                                        )
-                                    }
-                                }
-                            mInterstitialAd!!.fullScreenContentCallback =
-                                object : FullScreenContentCallback() {
-                                    override fun onAdFailedToShowFullScreenContent(adError: AdError) {
-                                        adCallback.onAdFail(adError.message)
-                                        isAdShowing = false
-                                        if (AppOpenManager.getInstance().isInitialized) {
-                                            AppOpenManager.getInstance().isAppResumeEnabled = true
-                                        }
-                                        isAdShowing = false
-                                        if (mInterstitialAd != null) {
-                                            mInterstitialAd = null
-                                        }
-                                        dismissAdDialog()
-                                        Log.e("Admodfail", "onAdFailedToLoad" + adError.message)
-                                        Log.e("Admodfail", "errorCodeAds" + adError.cause)
-                                    }
 
-                                    override fun onAdDismissedFullScreenContent() {
-                                        lastTimeShowInterstitial = Date().time
-                                        adCallback.onEventClickAdClosed()
-                                        if (mInterstitialAd != null) {
-                                            mInterstitialAd = null
-                                        }
-                                        isAdShowing = false
-                                        if (AppOpenManager.getInstance().isInitialized) {
-                                            AppOpenManager.getInstance().isAppResumeEnabled = true
-                                        }
-                                    }
+        val adRequest = AdRequest.Builder().build()
 
-                                    override fun onAdShowedFullScreenContent() {
-                                        super.onAdShowedFullScreenContent()
-                                        Log.e("===onAdShowed", "onAdShowedFullScreenContent")
-                                        adCallback.onAdShowed()
-                                        Handler(Looper.getMainLooper()).postDelayed({
-                                            dismissAdDialog()
-                                        }, 800)
-                                    }
+        InterstitialAd.load(activity, admobId, adRequest, object : InterstitialAdLoadCallback() {
+            override fun onAdLoaded(interstitialAd: InterstitialAd) {
+                adCallback.onAdLoaded()
 
-                                    override fun onAdClicked() {
-                                        super.onAdClicked()
-                                        adCallback.onClickAds()
-                                    }
-                                }
-                            if (activity.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED) && mInterstitialAd != null) {
-                                adCallback.onStartAction()
-                                mInterstitialAd!!.show(activity)
-                                isAdShowing = true
-                            } else {
-                                mInterstitialAd = null
-                                dismissAdDialog()
-                                isAdShowing = false
-                                if (AppOpenManager.getInstance().isInitialized) {
-                                    AppOpenManager.getInstance().isAppResumeEnabled = true
-                                }
-                                adCallback.onAdFail("Interstitial can't show in background")
-                            }
-                        } else {
-                            dismissAdDialog()
-                            adCallback.onAdFail("mInterstitialAd null")
-                            isAdShowing = false
-                            if (AppOpenManager.getInstance().isInitialized) {
-                                AppOpenManager.getInstance().isAppResumeEnabled = true
+                Handler(Looper.getMainLooper()).postDelayed({
+                    mInterstitialAd = interstitialAd
+
+                    mInterstitialAd?.apply {
+                        onPaidEventListener = OnPaidEventListener { adValue ->
+                            adValue?.let {
+                                AdjustUtils.postRevenueAdjustInter(this, it, adUnitId)
                             }
                         }
-                    }, 800)
-                }
 
-                override fun onAdFailedToLoad(loadAdError: LoadAdError) {
-                    super.onAdFailedToLoad(loadAdError)
-                    mInterstitialAd = null
-                    if (AppOpenManager.getInstance().isInitialized) {
-                        AppOpenManager.getInstance().isAppResumeEnabled = true
+                        fullScreenContentCallback = object : FullScreenContentCallback() {
+                            override fun onAdFailedToShowFullScreenContent(adError: AdError) {
+                                handleAdFailure(adError.message, adCallback, appOpenManager)
+                            }
+
+                            override fun onAdDismissedFullScreenContent() {
+                                lastTimeShowInterstitial = Date().time
+                                adCallback.onEventClickAdClosed()
+                                cleanupAfterAd(appOpenManager)
+                            }
+
+                            override fun onAdShowedFullScreenContent() {
+                                adCallback.onAdShowed()
+                                Handler(Looper.getMainLooper()).postDelayed({
+                                    dismissAdDialog()
+                                }, 800)
+                            }
+
+                            override fun onAdClicked() {
+                                adCallback.onClickAds()
+                            }
+                        }
+
+                        if (activity.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) {
+                            adCallback.onStartAction()
+                            show(activity)
+                            isAdShowing = true
+                        } else {
+                            handleAdFailure("Interstitial can't show in background", adCallback, appOpenManager)
+                        }
+                    } ?: run {
+                        handleAdFailure("mInterstitialAd null", adCallback, appOpenManager)
                     }
-                    isAdShowing = false
-                    adCallback.onAdFail(loadAdError.message)
-                    dismissAdDialog()
-                }
-            })
+                }, 800)
+            }
+
+            override fun onAdFailedToLoad(loadAdError: LoadAdError) {
+                handleAdFailure(loadAdError.message, adCallback, appOpenManager)
+            }
+        })
+    }
+
+    private fun handleAdFailure(
+        message: String,
+        adCallback: AdsInterCallBack,
+        appOpenManager: AppOpenManager
+    ) {
+        mInterstitialAd = null
+        isAdShowing = false
+        if (appOpenManager.isInitialized) {
+            appOpenManager.isAppResumeEnabled = true
+        }
+        dismissAdDialog()
+        adCallback.onAdFail(message)
+        Log.e("Admodfail", "Ad failed: $message")
+    }
+
+    private fun cleanupAfterAd(appOpenManager: AppOpenManager) {
+        mInterstitialAd = null
+        isAdShowing = false
+        if (appOpenManager.isInitialized) {
+            appOpenManager.isAppResumeEnabled = true
+        }
     }
 
     //Update New Lib

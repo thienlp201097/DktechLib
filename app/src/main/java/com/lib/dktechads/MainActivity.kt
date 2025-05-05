@@ -206,20 +206,6 @@ class MainActivity : AppCompatActivity() {
             })
         }
         binding.loadBanner.setOnClickListener {
-//            AdmobUtils.loadAdBanner(this,"",binding.bannerContainer,object : AdmobUtils.BannerCallBack{
-//                override fun onClickAds() {
-//
-//                }
-//
-//                override fun onLoad() {
-//                }
-//
-//                override fun onFailed(message: String) {
-//                }
-//
-//                override fun onPaid(adValue: AdValue?, mAdView: AdView?) {
-//                }
-//            })
             AdmobUtils.loadAndShowBannerWithConfig(this,"",5,10,binding.bannerContainer,
                 BannerPlugin.BannerConfig.TYPE_ADAPTIVE,object : AdmobUtils.BannerCollapsibleAdCallback{
                 override fun onClickAds() {
@@ -333,29 +319,29 @@ class MainActivity : AppCompatActivity() {
         }
 
         binding.showReward.setOnClickListener {
-//            AdmobUtils.showAdRewardWithCallback(this,rewardHolder,object :
-//                RewardAdCallback {
-//                override fun onAdClosed() {
-//                    Log.d("==RewardAdCallback==", "onAdClosed: ")
-//                }
-//
-//                override fun onAdShowed() {
-//                    Log.d("==RewardAdCallback==", "onAdShowed: ")
-//                }
-//
-//                override fun onAdFail(message: String?) {
-//
-//                }
-//
-//                override fun onEarned() {
-//                    Log.d("==RewardAdCallback==", "onEarned: ")
-//                }
-//
-//                override fun onPaid(adValue: AdValue?, adUnitAds: String?) {
-//
-//                }
-//
-//            })
+            AdmobUtils.showAdRewardWithCallback(this,rewardHolder,object :
+                RewardAdCallback {
+                override fun onAdClosed() {
+                    Log.d("==RewardAdCallback==", "onAdClosed: ")
+                }
+
+                override fun onAdShowed() {
+                    Log.d("==RewardAdCallback==", "onAdShowed: ")
+                }
+
+                override fun onAdFail(message: String?) {
+
+                }
+
+                override fun onEarned() {
+                    Log.d("==RewardAdCallback==", "onEarned: ")
+                }
+
+                override fun onPaid(adValue: AdValue?, adUnitAds: String?) {
+
+                }
+
+            })
             
             AdmobUtils.loadAndShowRewardedInterstitialAdWithCallback(this,"",object : RewardAdCallback{
                 override fun onAdClosed() {

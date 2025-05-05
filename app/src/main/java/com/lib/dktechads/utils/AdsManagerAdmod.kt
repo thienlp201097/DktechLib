@@ -77,7 +77,7 @@ object AdsManagerAdmod {
                 }
 
                 override fun onStartAction() {
-                    adListener.onAdClosed()
+//                    adListener.onAdClosed()
                 }
 
                 override fun onAdFail(error: String?) {
