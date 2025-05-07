@@ -33,10 +33,13 @@ android {
     }
 }
 
-publishing {
-    publications {
-        register<MavenPublication>("release") {
-            afterEvaluate {
+afterEvaluate {
+    publishing {
+        publications {
+            register<MavenPublication>("release") {
+                groupId = "com.github.thienlp201097"
+                artifactId = "DktechLib"
+                version = "2.0.7"
                 from(components["release"])
             }
         }
