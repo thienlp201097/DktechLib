@@ -60,25 +60,30 @@ dependencies {
     androidTestImplementation("androidx.test.espresso:espresso-core:3.4.0")
     implementation("com.pnikosis:materialish-progress:1.7")
     implementation("com.facebook.shimmer:shimmer:0.5.0@aar")
-
     // Ads
-    implementation("com.applovin:applovin-sdk:13.2.0")
-    implementation("com.google.android.gms:play-services-ads:+")
-    implementation("com.intuit.sdp:sdp-android:1.1.1")
+    api("com.applovin:applovin-sdk:13.2.0")
+    api("com.google.android.gms:play-services-ads:+")
+    api("com.intuit.sdp:sdp-android:1.1.1")
 
     // Other
-    implementation("com.google.code.gson:gson:2.10.1")
-    implementation("com.airbnb.android:lottie:6.6.0")
-    implementation("com.google.android.ump:user-messaging-platform:3.2.0")
+    api("com.google.code.gson:gson:2.10.1")
+    api("com.airbnb.android:lottie:6.6.2")
+    api("com.google.android.ump:user-messaging-platform:3.2.0")
+
+    //FaceBook
+    api("com.facebook.android:audience-network-sdk:6.+")
+    api("com.facebook.android:facebook-android-sdk:18.0.3")
+    api("androidx.annotation:annotation:1.0.0")
 
     //Adjust
-    implementation("com.adjust.sdk:adjust-android:5.2.0")
-    implementation("com.android.installreferrer:installreferrer:2.2")
-    implementation("com.google.android.gms:play-services-ads-identifier:18.1.0")
+    api("com.adjust.sdk:adjust-android:5.2.0")
+    api("com.android.installreferrer:installreferrer:2.2")
+    api("com.google.android.gms:play-services-ads-identifier:18.1.0")
 
-    implementation(platform("com.google.firebase:firebase-bom:+"))
-    implementation("com.google.firebase:firebase-analytics-ktx")
-    implementation("com.google.firebase:firebase-messaging")
-    implementation("com.google.firebase:firebase-crashlytics-ktx")
-    implementation("com.google.firebase:firebase-config")
+    //FireBase
+    api(platform("com.google.firebase:firebase-bom:+"))
+    api("com.google.firebase:firebase-analytics-ktx")
+    api("com.google.firebase:firebase-messaging")
+    api("com.google.firebase:firebase-crashlytics-ktx")
+    api("com.google.firebase:firebase-config")
 }

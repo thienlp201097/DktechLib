@@ -30,7 +30,7 @@ class SplashActivity : AppCompatActivity() {
         FireBaseConfig.initRemoteConfig(R.xml.remote_config_defaults,object : FireBaseConfig.CompleteListener{
             override fun onComplete() {
                 FireBaseConfig.getValue("test")
-                AdmobUtils.initAdmob(this@SplashActivity, isDebug = true, isEnableAds = true, object : MobileAdsListener {
+                AdmobUtils.initAdmob(this@SplashActivity, isDebug = true, isEnableAds = true,false, object : MobileAdsListener {
                     override fun onSuccess() {
                         Log.d("==initAdmob==", "initAdmob onSuccess: ")
                         AppOpenManager.getInstance()
@@ -49,12 +49,10 @@ class SplashActivity : AppCompatActivity() {
                                 Utils.getInstance().replaceActivity(this@SplashActivity, MainActivity::class.java)
 
                             }
-
                         })
                     }
                 })
             }
         })
-
     }
 }
