@@ -166,14 +166,16 @@ object AdmobUtils {
     fun loadAdBanner(
         activity: Activity,
         bannerId: String?,
-        viewGroup: ViewGroup,
+        viewGroup: ViewGroup,isCheckTestDevice: Boolean,
         bannerAdCallback: BannerCallBack
     ) {
-
-        if (isTestDevice){
-            bannerAdCallback.onFailed("None Show")
-            return
+        if (isCheckTestDevice){
+            if (isTestDevice){
+                bannerAdCallback.onFailed("None Show")
+                return
+            }
         }
+
         var bannerId = bannerId
         if (!isShowAds || !isNetworkConnected(activity)) {
             viewGroup.visibility = View.GONE
@@ -248,12 +250,14 @@ object AdmobUtils {
         activity: Activity,
         banner: BannerHolderAdmob,
         collapsibleBannerSize: CollapsibleBanner,
-        viewGroup: ViewGroup,
+        viewGroup: ViewGroup,isCheckTestDevice : Boolean,
         callback: BannerCollapsibleAdCallback
     ) {
-        if (isTestDevice){
-            callback.onAdFail("is Test Device")
-            return
+        if (isCheckTestDevice){
+            if (isTestDevice){
+                callback.onAdFail("None Show")
+                return
+            }
         }
         var bannerId = banner.ads
         if (!isShowAds || !isNetworkConnected(activity)) {
@@ -331,12 +335,14 @@ object AdmobUtils {
         activity: Activity,
         bannerId: String?,
         collapsibleBannerSize: CollapsibleBanner,
-        viewGroup: ViewGroup,
+        viewGroup: ViewGroup,isCheckTestDevice: Boolean,
         callback: BannerCollapsibleAdCallback
     ) {
-        if (isTestDevice){
-            callback.onAdFail("is Test Device")
-            return
+        if (isCheckTestDevice){
+            if (isTestDevice){
+                callback.onAdFail("None Show")
+                return
+            }
         }
         var bannerId = bannerId
         if (!isShowAds || !isNetworkConnected(activity)) {
@@ -502,13 +508,16 @@ object AdmobUtils {
     @JvmStatic
     fun loadAndGetNativeAds(
         context: Context,
-        nativeHolder: NativeHolderAdmob,
+        nativeHolder: NativeHolderAdmob,isCheckTestDevice: Boolean,
         adCallback: NativeAdmobCallback
     ) {
-        if (isTestDevice){
-            adCallback.onAdFail("is Test Device")
-            return
+        if (isCheckTestDevice){
+            if (isTestDevice){
+                adCallback.onAdFail("is Test Device")
+                return
+            }
         }
+
         if (!isShowAds || !isNetworkConnected(context)) {
             adCallback.onAdFail("No internet")
             return
@@ -569,13 +578,14 @@ object AdmobUtils {
         nativeHolder: NativeHolderAdmob,
         viewGroup: ViewGroup,
         layout: Int,
-        size: GoogleENative,
+        size: GoogleENative,isCheckTestDevice: Boolean,
         callback: AdsNativeCallBackAdmod
     ) {
-        if (isTestDevice){
-            viewGroup.visibility = View.GONE
-            callback.NativeFailed("is Test Device")
-            return
+        if (isCheckTestDevice){
+            if (isTestDevice){
+                callback.NativeFailed("is Test Device")
+                return
+            }
         }
         if (!isShowAds || !isNetworkConnected(activity)) {
             viewGroup.visibility = View.GONE
