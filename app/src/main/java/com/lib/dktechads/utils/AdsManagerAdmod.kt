@@ -176,7 +176,7 @@ object AdsManagerAdmod {
         AppOpenManager.getInstance().isAppResumeEnabled = true
         AdmobUtils.loadAndShowAdInterstitial(
             context as AppCompatActivity,
-            interHolder,
+            interHolder,true,
             object : AdsInterCallBack {
                 override fun onStartAction() {
 

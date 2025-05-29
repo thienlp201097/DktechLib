@@ -240,7 +240,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         binding.btnLoadShowInterAdmob.setOnClickListener {
-            AdmobUtils.loadAndShowAdInterstitial(this, AdsManagerAdmod.interholder,object :
+            AdmobUtils.loadAndShowAdInterstitial(this, AdsManagerAdmod.interholder,true,object :
                 AdsInterCallBack {
                 override fun onStartAction() {
 
@@ -366,7 +366,7 @@ class MainActivity : AppCompatActivity() {
                     
                 }
 
-            },true)
+            },true,true)
         }
 //        ApplovinUtil.showNativeWithLayout(nativeAds,this, AdsManager.nativeHolder,R.layout.native_custom_ad_view,
 //            GoogleENative.UNIFIED_MEDIUM,object :
