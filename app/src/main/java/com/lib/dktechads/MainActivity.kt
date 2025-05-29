@@ -274,7 +274,7 @@ class MainActivity : AppCompatActivity() {
 
         binding.loadAndShowNativeAdmob.setOnClickListener {
             AdmobUtils.loadAndShowNativeAdsWithLayoutAdsCollapsible(this,
-                AdsManagerAdmod.nativeHolder,binding.nativead,R.layout.ad_template_medium,GoogleENative.UNIFIED_MEDIUM,object :
+                AdsManagerAdmod.nativeHolder,binding.nativead,R.layout.ad_template_medium,GoogleENative.UNIFIED_MEDIUM,true,object :
                 AdmobUtils.NativeAdCallbackNew {
                 override fun onLoadedAndGetNativeAd(ad: NativeAd?) {
 
