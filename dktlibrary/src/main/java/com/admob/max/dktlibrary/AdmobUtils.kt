@@ -936,13 +936,15 @@ object AdmobUtils {
     @JvmStatic
     fun loadAndShowAdInterstitial(
         activity: AppCompatActivity,
-        admobHolder: InterHolderAdmob,
+        admobHolder: InterHolderAdmob,isCheckTestDevice: Boolean,
         adCallback: AdsInterCallBack,
         enableLoadingDialog: Boolean
     ) {
-        if (isTestDevice){
-            adCallback.onAdFail("is Test Device")
-            return
+        if (isCheckTestDevice){
+            if (isTestDevice){
+                adCallback.onAdFail("is Test Device")
+                return
+            }
         }
         var admobId = admobHolder.ads
         mInterstitialAd = null
@@ -1336,13 +1338,16 @@ object AdmobUtils {
     fun loadAndShowAdRewardWithCallback(
         activity: Activity,
         admobId: String?,
-        adCallback2: RewardAdCallback,
+        adCallback2: RewardAdCallback,isCheckTestDevice: Boolean,
         enableLoadingDialog: Boolean
     ) {
-        if (isTestDevice){
-            adCallback2.onAdFail("is Test Device")
-            return
+        if (isCheckTestDevice){
+            if (isTestDevice){
+                adCallback2.onAdFail("is Test Device")
+                return
+            }
         }
+
         var admobId = admobId
         mInterstitialAd = null
         isAdShowing = false
@@ -1458,13 +1463,16 @@ object AdmobUtils {
     fun loadAndShowRewardedInterstitialAdWithCallback(
         activity: Activity,
         admobId: String?,
-        adCallback2: RewardAdCallback,
+        adCallback2: RewardAdCallback,isCheckTestDevice: Boolean,
         enableLoadingDialog: Boolean
     ) {
-        if (isTestDevice){
-            adCallback2.onAdFail("is Test Device")
-            return
+        if (isCheckTestDevice){
+            if (isTestDevice){
+                adCallback2.onAdFail("is Test Device")
+                return
+            }
         }
+
         var admobId = admobId
         mInterstitialAd = null
         isAdShowing = false
