@@ -690,14 +690,17 @@ object AdmobUtils {
         nativeHolder: NativeHolderAdmob,
         viewGroup: ViewGroup,
         layout: Int,
-        size: GoogleENative,
+        size: GoogleENative,isCheckTestDevice: Boolean,
         adCallback: NativeAdCallbackNew
     ) {
-        if (isTestDevice){
-            viewGroup.visibility = View.GONE
-            adCallback.onAdFail("is Test Device")
-            return
+        if (isCheckTestDevice){
+            if (isTestDevice){
+                viewGroup.visibility = View.GONE
+                adCallback.onAdFail("is Test Device")
+                return
+            }
         }
+
         if (!isShowAds || !isNetworkConnected(activity)) {
             viewGroup.visibility = View.GONE
             return
@@ -781,13 +784,15 @@ object AdmobUtils {
         nativeHolder: NativeHolderAdmob,
         viewGroup: ViewGroup,
         layout: Int,
-        size: GoogleENative,
+        size: GoogleENative,isCheckTestDevice: Boolean,
         adCallback: NativeAdCallbackNew
     ) {
-        if (isTestDevice){
-            viewGroup.visibility = View.GONE
-            adCallback.onAdFail("is Test Device")
-            return
+        if (isCheckTestDevice){
+            if (isTestDevice){
+                viewGroup.visibility = View.GONE
+                adCallback.onAdFail("is Test Device")
+                return
+            }
         }
         if (!isShowAds || !isNetworkConnected(activity)) {
             viewGroup.visibility = View.GONE
