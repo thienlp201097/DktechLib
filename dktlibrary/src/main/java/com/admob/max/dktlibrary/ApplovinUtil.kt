@@ -23,9 +23,6 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
-import com.adjust.sdk.Adjust
-import com.adjust.sdk.AdjustAdRevenue
-import com.adjust.sdk.AdjustConfig
 import com.airbnb.lottie.LottieAnimationView
 import com.applovin.mediation.MaxAd
 import com.applovin.mediation.MaxAdFormat
@@ -46,7 +43,6 @@ import com.applovin.sdk.AppLovinMediationProvider
 import com.applovin.sdk.AppLovinSdk
 import com.applovin.sdk.AppLovinSdkInitializationConfiguration
 import com.applovin.sdk.AppLovinSdkUtils
-import com.admob.max.dktlibrary.adjust.AdjustUtils
 import com.admob.max.dktlibrary.callback_applovin.BannerCallback
 import com.admob.max.dktlibrary.callback_applovin.InterstititialCallback
 import com.admob.max.dktlibrary.callback_applovin.InterstititialCallbackNew
@@ -217,7 +213,6 @@ object ApplovinUtil : LifecycleObserver {
 
         interstitialAd.setRevenueListener { p0 ->
             callback.onAdRevenuePaid(p0)
-            AdjustUtils.postRevenueAdjustMax(p0)
         }
         interstitialAd.setListener(object : MaxAdListener {
             override fun onAdLoaded(p0: MaxAd) {
@@ -483,7 +478,6 @@ object ApplovinUtil : LifecycleObserver {
 
         banner?.setRevenueListener { ad ->
             callback.onAdRevenuePaid(ad)
-            AdjustUtils.postRevenueAdjustMax(ad)
         }
 
         banner?.setListener(object : MaxAdViewAdListener {
@@ -574,7 +568,6 @@ object ApplovinUtil : LifecycleObserver {
 
         rewardAd.setRevenueListener { p0 ->
             callback.onAdRevenuePaid(p0)
-            AdjustUtils.postRevenueAdjustMax(p0)
         }
         rewardAd.setListener(object : MaxRewardedAdListener {
             override fun onAdLoaded(p0: MaxAd) {
@@ -736,7 +729,6 @@ object ApplovinUtil : LifecycleObserver {
         nativeAdLoader = MaxNativeAdLoader(idAd, activity)
         nativeAdLoader.setRevenueListener { ad ->
             adCallback.onAdRevenuePaid(ad)
-            AdjustUtils.postRevenueAdjustMax(ad)
         }
         nativeAdLoader.setNativeAdListener(object : MaxNativeAdListener() {
 
@@ -793,7 +785,6 @@ object ApplovinUtil : LifecycleObserver {
         shimmerFrameLayout.startShimmer()
         nativeAdLoader.setRevenueListener { p0 ->
             adCallback.onAdRevenuePaid(p0)
-            AdjustUtils.postRevenueAdjustMax(p0)
         }
         nativeAdLoader.setNativeAdListener(object : MaxNativeAdListener() {
 
@@ -928,7 +919,6 @@ object ApplovinUtil : LifecycleObserver {
         }
         interHolder.inter?.setRevenueListener { ad ->
             callback.onAdRevenuePaid(ad)
-            AdjustUtils.postRevenueAdjustMax(ad)
         }
 
         if (!interHolder.check) {
@@ -1137,7 +1127,6 @@ object ApplovinUtil : LifecycleObserver {
         nativeHolder.nativeAdLoader = MaxNativeAdLoader(nativeHolder.adsId, activity)
         nativeHolder.nativeAdLoader?.setRevenueListener { ad ->
             adCallback.onAdRevenuePaid(ad)
-            AdjustUtils.postRevenueAdjustMax(ad)
         }
         nativeHolder.nativeAdLoader?.setNativeAdListener(object : MaxNativeAdListener() {
             override fun onNativeAdLoaded(nativeAdView: MaxNativeAdView?, ad: MaxAd) {
@@ -1308,7 +1297,6 @@ object ApplovinUtil : LifecycleObserver {
 
         nativeHolder.nativeAdLoader?.setRevenueListener { ad ->
             adCallback.onAdRevenuePaid(ad)
-            AdjustUtils.postRevenueAdjustMax(ad)
         }
         nativeHolder.nativeAdLoader?.setNativeAdListener(object : MaxNativeAdListener() {
             override fun onNativeAdLoaded(nativeAdView: MaxNativeAdView?, ad: MaxAd) {
@@ -1395,7 +1383,6 @@ object ApplovinUtil : LifecycleObserver {
 
         nativeHolder.nativeAdLoader?.setRevenueListener { ad ->
             adCallback.onAdRevenuePaid(ad)
-            AdjustUtils.postRevenueAdjustMax(ad)
         }
         nativeHolder.nativeAdLoader?.setNativeAdListener(object : MaxNativeAdListener() {
             override fun onNativeAdLoaded(nativeAdView: MaxNativeAdView?, ad: MaxAd) {

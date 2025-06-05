@@ -11,7 +11,6 @@ import android.view.View
 import android.view.Window
 import android.widget.LinearLayout
 import android.widget.TextView
-import com.admob.max.dktlibrary.adjust.AdjustUtils
 import com.airbnb.lottie.LottieAnimationView
 import com.google.android.gms.ads.AdError
 import com.google.android.gms.ads.AdRequest
@@ -167,7 +166,6 @@ class AOAManager(private val activity: Activity,val appOpen: String,val timeOut:
                         }
                         setOnPaidEventListener {
                             appOpenAdsListener.onAdPaid(it,adUnitId)
-                            AdjustUtils.postRevenueAdjust(it,adUnitId)
                         }
                         show(activity)
                     }else{
