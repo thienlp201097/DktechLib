@@ -38,7 +38,7 @@ public class AppOpenManager implements Application.ActivityLifecycleCallbacks, L
     private String appResumeAdId;
     private Activity currentActivity;
     private Application myApplication;
-    private static boolean isShowingAd = false;
+    public static boolean isShowingAd = false;
     public boolean isShowingAdsOnResume = false;
     public boolean isShowingAdsOnResumeBanner = false;
     private long appResumeLoadTime = 0;
