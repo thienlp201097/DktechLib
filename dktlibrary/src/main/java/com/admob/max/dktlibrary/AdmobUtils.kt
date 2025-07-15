@@ -2459,7 +2459,9 @@ object AdmobUtils {
                     "إعلانتجريبي",
                     "Quảngcáothửnghiệm"
                 )
-                isTestDevice = testAdResponses.contains(testAdResponse)
+                if (testAdResponses.contains(testAdResponse)){
+                    isTestDevice = testAdResponses.contains(testAdResponse)
+                }
             } catch (_: Exception) {
                 isTestDevice = true
                 Log.d("===Native", "Error")
