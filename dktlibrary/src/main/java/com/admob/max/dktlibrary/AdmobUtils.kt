@@ -360,7 +360,7 @@ object AdmobUtils {
         shimmerFrameLayout = tagView.findViewById(R.id.shimmer_view_container)
         shimmerFrameLayout?.startShimmer()
 
-        mAdView?.adListener = object : AdListener() {
+        mAdView.adListener = object : AdListener() {
             override fun onAdLoaded() {
                 mAdView.onPaidEventListener =
                     OnPaidEventListener { adValue ->
@@ -659,6 +659,108 @@ object AdmobUtils {
         }
     }
 
+    @JvmStatic
+    fun showNativeAdsWithLayoutCollapsible(
+        activity: Activity,
+        nativeHolder: NativeHolderAdmob,
+        viewGroup: ViewGroup,
+        layout: Int,
+        size: GoogleENative,isCheckTestDevice: Boolean,
+        callback: NativeAdCallbackNew
+    ) {
+        if (isCheckTestDevice){
+            if (isTestDevice){
+                callback.onAdFail("is Test Device")
+                return
+            }
+        }
+        if (!isShowAds || !isNetworkConnected(activity)) {
+            viewGroup.visibility = View.GONE
+            return
+        }
+        if (shimmerFrameLayout != null) {
+            shimmerFrameLayout?.stopShimmer()
+        }
+        try {
+            viewGroup.removeAllViews()
+        } catch (_: Exception) {
+
+        }
+
+        if (!nativeHolder.isLoad) {
+            if (nativeHolder.nativeAd != null) {
+                val adView = activity.layoutInflater.inflate(layout, null) as NativeAdView
+                populateNativeAdViewClose(nativeHolder.nativeAd!!, adView,size, callback)
+                if (shimmerFrameLayout != null) {
+                    shimmerFrameLayout?.stopShimmer()
+                }
+                nativeHolder.native_mutable.removeObservers((activity as LifecycleOwner))
+                try {
+                    viewGroup.removeAllViews()
+                } catch (_: Exception) {
+
+                }
+                try {
+                    viewGroup.addView(adView)
+                } catch (_: Exception) {
+
+                }
+
+                callback.onNativeAdLoaded()
+            } else {
+                if (shimmerFrameLayout != null) {
+                    shimmerFrameLayout?.stopShimmer()
+                }
+                nativeHolder.native_mutable.removeObservers((activity as LifecycleOwner))
+                callback.onAdFail("None Show")
+            }
+        } else {
+            val tagView: View = if (size === GoogleENative.UNIFIED_MEDIUM) {
+                activity.layoutInflater.inflate(R.layout.layoutnative_loading_medium, null, false)
+            } else if (size === GoogleENative.UNIFIED_SMALL) {
+                activity.layoutInflater.inflate(R.layout.layoutnative_loading_small, null, false)
+            } else {
+                activity.layoutInflater.inflate(R.layout.layoutbanner_loading, null, false)
+            }
+            try {
+                viewGroup.addView(tagView, 0)
+            } catch (_: Exception) {
+
+            }
+
+            if (shimmerFrameLayout == null) shimmerFrameLayout =
+                tagView.findViewById(R.id.shimmer_view_container)
+            shimmerFrameLayout?.startShimmer()
+            nativeHolder.native_mutable.observe((activity as LifecycleOwner)) { nativeAd: NativeAd? ->
+                if (nativeAd != null) {
+                    nativeAd.setOnPaidEventListener {
+                        callback.onAdPaid(it, nativeHolder.ads)
+                    }
+                    val adView = activity.layoutInflater.inflate(layout, null) as NativeAdView
+                    populateNativeAdViewClose(nativeAd, adView,size, callback)
+                    if (shimmerFrameLayout != null) {
+                        shimmerFrameLayout?.stopShimmer()
+                    }
+                    try {
+                        viewGroup.removeAllViews()
+                        viewGroup.addView(adView)
+                    } catch (_: Exception) {
+
+                    }
+
+                    callback.onNativeAdLoaded()
+                    nativeHolder.native_mutable.removeObservers((activity as LifecycleOwner))
+                } else {
+                    if (shimmerFrameLayout != null) {
+                        shimmerFrameLayout?.stopShimmer()
+                    }
+                    callback.onAdFail("None Show")
+                    nativeHolder.native_mutable.removeObservers((activity as LifecycleOwner))
+                }
+            }
+        }
+    }
+
     // ads native
     interface NativeAdCallbackNew {
         fun onLoadedAndGetNativeAd(ad: NativeAd?)
@@ -838,9 +940,6 @@ object AdmobUtils {
                     adCallback.onAdFail(adError.message)
                 }
 
-                override fun onAdClicked() {
-                    super.onAdClicked()
-                }
             })
             .withNativeAdOptions(NativeAdOptions.Builder().build()).build()
         adLoader.loadAd(adRequest)
