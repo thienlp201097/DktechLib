@@ -881,6 +881,7 @@ object AdmobUtils {
         }
         if (!isShowAds || !isNetworkConnected(activity)) {
             viewGroup.visibility = View.GONE
+            adCallback.onAdFail("no internet")
             return
         }
         val adRequest = AdRequest.Builder().build()
