@@ -71,8 +71,8 @@ dependencies {
     implementation("com.airbnb.android:lottie:6.6.0")
     implementation("com.google.android.ump:user-messaging-platform:3.2.0")
 
-    implementation(platform("com.google.firebase:firebase-bom:33.13.0"))
-    implementation("com.google.firebase:firebase-analytics-ktx")
-    implementation("com.google.firebase:firebase-crashlytics-ktx")
+    implementation(platform("com.google.firebase:firebase-bom:34.0.0"))
+    implementation("com.google.firebase:firebase-analytics")
+    implementation("com.google.firebase:firebase-crashlytics-ndk")
     implementation("com.google.firebase:firebase-config")
 }
