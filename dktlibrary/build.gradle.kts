@@ -75,4 +75,9 @@ dependencies {
     implementation("com.google.firebase:firebase-analytics")
     implementation("com.google.firebase:firebase-crashlytics-ndk")
     implementation("com.google.firebase:firebase-config")
+
+    implementation ("com.reyun.solar.engine.oversea:solar-engine-core:1.3.0.5"){
+        exclude(group = "com.huawei.hms", module = "ads-identifier")
+        exclude(group = "com.hihonor.mcs", module = "ads-identifier")
+    }
 }

@@ -43,12 +43,14 @@ import com.applovin.sdk.AppLovinSdkUtils.runOnUiThread
 import com.facebook.shimmer.ShimmerFrameLayout
 import com.google.ads.mediation.admob.AdMobAdapter
 import com.google.android.gms.ads.AdError
+import com.google.android.gms.ads.AdFormat
 import com.google.android.gms.ads.AdListener
 import com.google.android.gms.ads.AdLoader
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdSize
 import com.google.android.gms.ads.AdValue
 import com.google.android.gms.ads.AdView
+import com.google.android.gms.ads.AdapterResponseInfo
 import com.google.android.gms.ads.FullScreenContentCallback
 import com.google.android.gms.ads.LoadAdError
 import com.google.android.gms.ads.MobileAds
@@ -63,6 +65,8 @@ import com.google.android.gms.ads.rewarded.RewardedAd
 import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback
 import com.google.android.gms.ads.rewardedinterstitial.RewardedInterstitialAd
 import com.google.android.gms.ads.rewardedinterstitial.RewardedInterstitialAdLoadCallback
+import com.reyun.solar.engine.SolarEngineManager
+import com.reyun.solar.engine.infos.SEAdImpEventModel
 import com.vapp.admoblibrary.ads.remote.BannerRemoteConfig
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -202,7 +206,7 @@ object AdmobUtils {
         shimmerFrameLayout?.startShimmer()
         mAdView.onPaidEventListener =
             OnPaidEventListener { adValue ->
-
+                adImpressionSolarEngineSDK(adValue,bannerId,0,mAdView.responseInfo?.loadedAdapterResponseInfo)
             }
         mAdView.adListener = object : AdListener() {
             override fun onAdLoaded() {
@@ -286,7 +290,7 @@ object AdmobUtils {
             override fun onAdLoaded() {
                 banner.mAdView?.onPaidEventListener =
                     OnPaidEventListener { adValue ->
-
+                        adImpressionSolarEngineSDK(adValue,bannerId,0,mAdView?.responseInfo?.loadedAdapterResponseInfo)
                     }
                 shimmerFrameLayout?.stopShimmer()
                 viewGroup.removeView(tagView)
@@ -364,7 +368,7 @@ object AdmobUtils {
             override fun onAdLoaded() {
                 mAdView.onPaidEventListener =
                     OnPaidEventListener { adValue ->
-
+                        adImpressionSolarEngineSDK(adValue,bannerId,0,mAdView.responseInfo?.loadedAdapterResponseInfo)
                     }
                 shimmerFrameLayout?.stopShimmer()
                 viewGroup.removeView(tagView)
@@ -530,6 +534,7 @@ object AdmobUtils {
                 checkAdsTest(nativeAd)
                 nativeAd.setOnPaidEventListener { adValue: AdValue? ->
                     adValue?.let {
+                        adImpressionSolarEngineSDK(it,nativeHolder.ads,4,nativeAd.responseInfo?.loadedAdapterResponseInfo)
                         adCallback.onPaid(adValue, nativeHolder.ads)
 
                     }
@@ -587,6 +592,10 @@ object AdmobUtils {
 
         if (!nativeHolder.isLoad) {
             if (nativeHolder.nativeAd != null) {
+                nativeHolder.nativeAd?.setOnPaidEventListener {
+                    adImpressionSolarEngineSDK(it,nativeHolder.ads,4,nativeHolder.nativeAd?.responseInfo?.loadedAdapterResponseInfo)
+                    callback.onPaid(it, nativeHolder.ads)
+                }
                 val adView = activity.layoutInflater.inflate(layout, null) as NativeAdView
                 populateNativeAdView(nativeHolder.nativeAd!!, adView, size)
                 if (shimmerFrameLayout != null) {
@@ -632,6 +641,7 @@ object AdmobUtils {
             nativeHolder.native_mutable.observe((activity as LifecycleOwner)) { nativeAd: NativeAd? ->
                 if (nativeAd != null) {
                     nativeAd.setOnPaidEventListener {
+                        adImpressionSolarEngineSDK(it,nativeHolder.ads,4,nativeAd.responseInfo?.loadedAdapterResponseInfo)
                         callback.onPaid(it, nativeHolder.ads)
                     }
                     val adView = activity.layoutInflater.inflate(layout, null) as NativeAdView
@@ -689,6 +699,9 @@ object AdmobUtils {
 
         if (!nativeHolder.isLoad) {
             if (nativeHolder.nativeAd != null) {
+                nativeHolder.nativeAd?.setOnPaidEventListener {
+                    adImpressionSolarEngineSDK(it,nativeHolder.ads,4,nativeHolder.nativeAd?.responseInfo?.loadedAdapterResponseInfo)
+                }
                 val adView = activity.layoutInflater.inflate(layout, null) as NativeAdView
                 populateNativeAdViewClose(nativeHolder.nativeAd!!, adView,size, callback)
                 if (shimmerFrameLayout != null) {
@@ -734,6 +747,7 @@ object AdmobUtils {
             nativeHolder.native_mutable.observe((activity as LifecycleOwner)) { nativeAd: NativeAd? ->
                 if (nativeAd != null) {
                     nativeAd.setOnPaidEventListener {
+                        adImpressionSolarEngineSDK(it,nativeHolder.ads,4,nativeAd.responseInfo?.loadedAdapterResponseInfo)
                         callback.onAdPaid(it, nativeHolder.ads)
                     }
                     val adView = activity.layoutInflater.inflate(layout, null) as NativeAdView
@@ -835,6 +849,7 @@ object AdmobUtils {
                 }
 
                 nativeAd.setOnPaidEventListener { adValue: AdValue ->
+                    adImpressionSolarEngineSDK(adValue,nativeHolder.ads,4,nativeAd.responseInfo?.loadedAdapterResponseInfo)
                     adCallback.onAdPaid(adValue, s)
                 }
                 //viewGroup.setVisibility(View.VISIBLE);
@@ -924,6 +939,7 @@ object AdmobUtils {
                 }
 
                 nativeAd.setOnPaidEventListener { adValue: AdValue ->
+                    adImpressionSolarEngineSDK(adValue,nativeHolder.ads,4,nativeAd.responseInfo?.loadedAdapterResponseInfo)
                     adCallback.onAdPaid(adValue, s)
                 }
                 //viewGroup.setVisibility(View.VISIBLE);
@@ -984,6 +1000,7 @@ object AdmobUtils {
                 }
 
                 nativeAd.setOnPaidEventListener { adValue: AdValue ->
+                    adImpressionSolarEngineSDK(adValue,nativeHolder.ads,4,nativeAd.responseInfo?.loadedAdapterResponseInfo)
                     adCallback.onAdPaid(adValue, s)
                 }
                 //viewGroup.setVisibility(View.VISIBLE);
@@ -1070,7 +1087,7 @@ object AdmobUtils {
 
                     mInterstitialAd?.apply {
                         onPaidEventListener = OnPaidEventListener { adValue ->
-
+                            adImpressionSolarEngineSDK(adValue, admobId,1,interstitialAd.responseInfo.loadedAdapterResponseInfo)
                         }
 
                         fullScreenContentCallback = object : FullScreenContentCallback() {
@@ -1176,6 +1193,7 @@ object AdmobUtils {
                     interHolder.inter = interstitialAd
                     interHolder.check = false
                     interHolder.inter!!.setOnPaidEventListener { adValue ->
+                        adImpressionSolarEngineSDK(adValue,interHolder.inter!!.adUnitId,1,interHolder.inter!!.responseInfo.loadedAdapterResponseInfo)
                         Log.d("==Advalue==", "onAdLoaded:  ${interHolder.inter!!.responseInfo}")
                         adLoadCallback.onPaid(adValue, interHolder.inter!!.adUnitId)
                     }
@@ -1249,7 +1267,9 @@ object AdmobUtils {
                     isClick = false
                     Handler(Looper.getMainLooper()).postDelayed({
                         Log.d("===DelayLoad", "delay")
-
+                        aBoolean.setOnPaidEventListener {
+                            adImpressionSolarEngineSDK(it, interHolder.ads,1,aBoolean.responseInfo.loadedAdapterResponseInfo)
+                        }
                         aBoolean.fullScreenContentCallback = object : FullScreenContentCallback() {
                             override fun onAdDismissedFullScreenContent() {
                                 isAdShowing = false
@@ -1464,7 +1484,8 @@ object AdmobUtils {
                     mRewardedAd = rewardedAd
                     if (mRewardedAd != null) {
                         mRewardedAd?.setOnPaidEventListener {
-
+                            adImpressionSolarEngineSDK(it,admobId,2,
+                                mRewardedAd?.responseInfo?.loadedAdapterResponseInfo)
                         }
                         mRewardedAd?.fullScreenContentCallback =
                             object : FullScreenContentCallback() {
@@ -1586,7 +1607,8 @@ object AdmobUtils {
                     mRewardedInterstitialAd = rewardedAd
                     if (mRewardedInterstitialAd != null) {
                         mRewardedInterstitialAd?.setOnPaidEventListener {
-
+                            adImpressionSolarEngineSDK(it,admobId,2,
+                                mRewardedInterstitialAd?.responseInfo?.loadedAdapterResponseInfo)
                         }
                         mRewardedInterstitialAd?.fullScreenContentCallback =
                             object : FullScreenContentCallback() {
@@ -1737,7 +1759,8 @@ object AdmobUtils {
                         reward?.let {
                             mInterstitialRewardAd.mutable.removeObservers((activity as LifecycleOwner))
                             it.setOnPaidEventListener { value ->
-
+                                adImpressionSolarEngineSDK(value,mInterstitialRewardAd.ads,2,
+                                    mInterstitialRewardAd.inter?.responseInfo?.loadedAdapterResponseInfo)
                             }
                             mInterstitialRewardAd.inter?.fullScreenContentCallback =
                                 object : FullScreenContentCallback() {
@@ -1785,6 +1808,8 @@ object AdmobUtils {
                         delay(800)
 
                         mInterstitialRewardAd.inter?.setOnPaidEventListener {
+                            adImpressionSolarEngineSDK(it,mInterstitialRewardAd.ads,2,
+                                mInterstitialRewardAd.inter?.responseInfo?.loadedAdapterResponseInfo)
                         }
                         mInterstitialRewardAd.inter?.fullScreenContentCallback =
                             object : FullScreenContentCallback() {
@@ -1920,7 +1945,8 @@ object AdmobUtils {
                         reward?.let {
                             mInterstitialRewardAd.mutable.removeObservers((activity as LifecycleOwner))
                             it.setOnPaidEventListener { value ->
-
+                                adImpressionSolarEngineSDK(value,mInterstitialRewardAd.ads,2,
+                                    mInterstitialRewardAd.inter?.responseInfo?.loadedAdapterResponseInfo)
                             }
                             mInterstitialRewardAd.inter?.fullScreenContentCallback =
                                 object : FullScreenContentCallback() {
@@ -1968,6 +1994,8 @@ object AdmobUtils {
                         delay(800)
 
                         mInterstitialRewardAd.inter?.setOnPaidEventListener {
+                            adImpressionSolarEngineSDK(it,mInterstitialRewardAd.ads,2,
+                                mInterstitialRewardAd.inter?.responseInfo?.loadedAdapterResponseInfo)
                         }
                         mInterstitialRewardAd.inter?.fullScreenContentCallback =
                             object : FullScreenContentCallback() {
@@ -2141,7 +2169,7 @@ object AdmobUtils {
         builder.forNativeAd { nativeAd ->
             checkAdsTest(nativeAd)
             nativeAd.setOnPaidEventListener { adValue: AdValue? ->
-
+                adValue?.let { adImpressionSolarEngineSDK(it,adMobId,4,nativeAd.responseInfo?.loadedAdapterResponseInfo) }
             }
             listener.onLoaded(nativeAd)
             populateNativeAdView(nativeAd, adView.findViewById(R.id.native_ad_view))
@@ -2208,7 +2236,7 @@ object AdmobUtils {
             nativeHolder.native_mutable.value = nativeAd
             checkAdsTest(nativeAd)
             nativeAd.setOnPaidEventListener { adValue: AdValue? ->
-
+                adValue?.let { adImpressionSolarEngineSDK(it,nativeHolder.ads,4,nativeAd.responseInfo?.loadedAdapterResponseInfo) }
             }
             adCallback.onLoadedAndGetNativeAd(nativeAd)
         }
@@ -2252,6 +2280,9 @@ object AdmobUtils {
         viewGroup.removeAllViews()
         if (!nativeHolder.isLoad) {
             if (nativeHolder.nativeAd != null) {
+                nativeHolder.nativeAd?.setOnPaidEventListener {
+                    adImpressionSolarEngineSDK(it,nativeHolder.ads,4,nativeHolder.nativeAd?.responseInfo?.loadedAdapterResponseInfo)
+                }
                 val adView = activity.layoutInflater.inflate(layout, null) as NativeAdView
                 populateNativeAdView(
                     nativeHolder.nativeAd!!,
@@ -2286,6 +2317,7 @@ object AdmobUtils {
             nativeHolder.native_mutable.observe((activity as LifecycleOwner)) { nativeAd: NativeAd? ->
                 if (nativeAd != null) {
                     nativeAd.setOnPaidEventListener {
+                        adImpressionSolarEngineSDK(it,nativeHolder.ads,4,nativeAd.responseInfo?.loadedAdapterResponseInfo)
                     }
 
                     val adView = activity.layoutInflater.inflate(layout, null) as NativeAdView
@@ -2347,7 +2379,7 @@ object AdmobUtils {
             listener.onLoaded(nativeAd)
             checkAdsTest(nativeAd)
             nativeAd.setOnPaidEventListener { adValue: AdValue? ->
-
+                adValue?.let { adImpressionSolarEngineSDK(it,adMobId,4,nativeAd.responseInfo?.loadedAdapterResponseInfo) }
             }
             populateNativeAdView(nativeAd, adView.findViewById(R.id.native_ad_view))
             try {
@@ -2426,6 +2458,7 @@ object AdmobUtils {
 
                 }
                 nativeAd.setOnPaidEventListener { adValue: AdValue ->
+                    adImpressionSolarEngineSDK(adValue,s,4,nativeAd.responseInfo?.loadedAdapterResponseInfo)
                     adCallback.onAdPaid(adValue, s)
                 }
                 //viewGroup.setVisibility(View.VISIBLE);
@@ -2515,6 +2548,7 @@ object AdmobUtils {
             nativeHolder.native_mutable.observe((activity as LifecycleOwner)) { nativeAd: NativeAd? ->
                 if (nativeAd != null) {
                     nativeAd.setOnPaidEventListener {
+                        adImpressionSolarEngineSDK(it,nativeHolder.ads,4,nativeAd.responseInfo?.loadedAdapterResponseInfo)
                         callback.onPaid(it, nativeHolder.ads)
                     }
                     val adView = activity.layoutInflater.inflate(layout, null) as NativeAdView
@@ -2571,5 +2605,36 @@ object AdmobUtils {
         }else{
             isTestDevice = false
         }
+    }
+
+    @JvmStatic
+    fun adImpressionSolarEngineSDK(adValue: AdValue, adUnitId: String, adFormat: Int, loadedAdapterResponseInfo : AdapterResponseInfo?){
+        val valueMicros: Long = adValue.valueMicros
+        val currencyCode: String = adValue.currencyCode
+        val precision: Int = adValue.precisionType
+        Log.d("==SolarEngine==", "adImpressionSolarEngineSDK: $valueMicros")
+        // Get the ad unit ID.
+        val adSourceName: String = loadedAdapterResponseInfo?.adSourceName.toString()
+        val adSourceId: String = loadedAdapterResponseInfo?.adSourceId.toString()
+        //SE SDK processing logic
+        val seAdImpEventModel: SEAdImpEventModel = SEAdImpEventModel()
+        //Monetization Platform Name
+        seAdImpEventModel.setAdNetworkPlatform(adSourceName)
+        //Mediation Platform Name (e.g. admob SDK as "admob")
+        seAdImpEventModel.setMediationPlatform("admob")
+        //Displayed Ad Type (Taking Rewarded Ad as an example, adType = 1)
+        seAdImpEventModel.setAdType(adFormat)
+        //Monetization Platform App ID
+        seAdImpEventModel.setAdNetworkAppID(adSourceId)
+        //Monetization Platform Ad Unit ID
+        seAdImpEventModel.setAdNetworkADID(adUnitId)
+        //Ad eCPM
+        seAdImpEventModel.setEcpm((valueMicros / 1000).toDouble())
+        //Monetization Platform Currency Type
+        seAdImpEventModel.setCurrencyType(currencyCode)
+        //True: rendered success
+        seAdImpEventModel.setRenderSuccess(true)
+        //You can add custom properties as needed. Here we do not give examples.
+        SolarEngineManager.getInstance().trackAdImpression(seAdImpEventModel)
     }
 }

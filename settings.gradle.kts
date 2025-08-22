@@ -8,6 +8,7 @@ pluginManagement {
             }
         }
         mavenCentral()
+        maven { url = uri("https://maven-android.solar-engine.com/repository/se_sdk_for_android/") }
         gradlePluginPortal()
     }
 }
@@ -16,6 +17,7 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+        maven { url = uri("https://maven-android.solar-engine.com/repository/se_sdk_for_android/") }
     }
 }
 

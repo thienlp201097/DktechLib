@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.Window;
 import android.widget.LinearLayout;
 
+import androidx.annotation.NonNull;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleObserver;
 import androidx.lifecycle.OnLifecycleEvent;
@@ -20,8 +21,10 @@ import androidx.lifecycle.ProcessLifecycleOwner;
 import com.google.android.gms.ads.AdActivity;
 import com.google.android.gms.ads.AdError;
 import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdValue;
 import com.google.android.gms.ads.FullScreenContentCallback;
 import com.google.android.gms.ads.LoadAdError;
+import com.google.android.gms.ads.OnPaidEventListener;
 import com.google.android.gms.ads.appopen.AppOpenAd;
 
 import java.util.ArrayList;
@@ -356,6 +359,12 @@ public class AppOpenManager implements Application.ActivityLifecycleCallbacks, L
         if (ProcessLifecycleOwner.get().getLifecycle().getCurrentState().isAtLeast(Lifecycle.State.STARTED)) {
             new Handler().postDelayed(() -> {
                 if (appResumeAd != null){
+                    appResumeAd.setOnPaidEventListener(new OnPaidEventListener() {
+                        @Override
+                        public void onPaidEvent(@NonNull AdValue adValue) {
+                            AdmobUtils.adImpressionSolarEngineSDK(adValue,appResumeAdId,6,appResumeAd.getResponseInfo().getLoadedAdapterResponseInfo());
+                        }
+                    });
                     appResumeAd.setFullScreenContentCallback(callback);
                     if (currentActivity != null){
                         showDialog(currentActivity);
