@@ -64,6 +64,7 @@ dependencies {
     // Ads
     implementation("com.applovin:applovin-sdk:13.2.0")
     implementation("com.google.android.gms:play-services-ads:24.2.0")
+    implementation("com.android.installreferrer:installreferrer:2.2")
     implementation("com.intuit.sdp:sdp-android:1.1.1")
 
     // Other

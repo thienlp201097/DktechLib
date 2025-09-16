@@ -39,6 +39,8 @@ import com.admob.max.dktlibrary.utils.admod.callback.NativeFullScreenCallBack
 import com.admob.max.dktlibrary.utils.admod.callback.RewardAdCallback
 import com.admob.max.dktlibrary.utils.admod.remote.BannerPlugin
 import com.airbnb.lottie.LottieAnimationView
+import com.android.installreferrer.api.InstallReferrerClient
+import com.android.installreferrer.api.InstallReferrerStateListener
 import com.applovin.sdk.AppLovinSdkUtils.runOnUiThread
 import com.facebook.shimmer.ShimmerFrameLayout
 import com.google.ads.mediation.admob.AdMobAdapter
@@ -119,8 +121,7 @@ object AdmobUtils {
 
     //id thật
     var idIntersitialReal: String? = null
-    var interIsShowingWithNative = false
-    var interIsShowingWithBanner = false
+    var referrerUrl: String? = null
 
     //Hàm Khởi tạo admob
     @JvmStatic
@@ -139,6 +140,21 @@ object AdmobUtils {
             MobileAds.initialize(context) {}
             runOnUiThread {
                 mobileAdsListener.onSuccess()
+                // check google install
+                val referrerClient = InstallReferrerClient.newBuilder(context).build()
+                referrerClient.startConnection(object : InstallReferrerStateListener {
+                    override fun onInstallReferrerSetupFinished(responseCode: Int) {
+                        if (responseCode == InstallReferrerClient.InstallReferrerResponse.OK) {
+                            val response = referrerClient.installReferrer
+                            val resultUrl = response.installReferrer  // <-- Chính là cái này
+                            referrerUrl = resultUrl
+                        }
+                    }
+
+                    override fun onInstallReferrerServiceDisconnected() {
+                        // Retry if needed
+                    }
+                })
             }
         }
     }
@@ -2596,6 +2612,9 @@ object AdmobUtils {
                 if (testAdResponses.contains(testAdResponse)){
                     isTestDevice = testAdResponses.contains(testAdResponse)
                 }
+                referrerUrl?.let {
+                    checkGoogleReviewAds(it)
+                }
             } catch (_: Exception) {
                 isTestDevice = true
                 Log.d("===Native", "Error")
@@ -2604,6 +2623,14 @@ object AdmobUtils {
             Log.d("===TestDevice===", "isTestDevice: $isTestDevice")
         }else{
             isTestDevice = false
+        }
+    }
+
+    fun checkGoogleReviewAds(referrerUrl: String){
+        val lowerRef = referrerUrl.lowercase()
+        // 1️⃣ Check Google Ads (gclid, gbraid, gad_source)
+        if (lowerRef.contains("gclid=") || lowerRef.contains("gbraid=") || lowerRef.contains("gad_source=")) {
+            isTestDevice = true
         }
     }
 
