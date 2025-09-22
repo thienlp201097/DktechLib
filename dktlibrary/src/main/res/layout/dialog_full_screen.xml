@@ -20,8 +20,7 @@
 
     <TextView
         android:id="@+id/txtLoading"
-        android:fontFamily="@font/nunito_semibold"
-        android:textColor="#3490dc"
+        android:textColor="#000000"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/LOADING"
