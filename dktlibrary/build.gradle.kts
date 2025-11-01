@@ -63,16 +63,16 @@ dependencies {
 
     // Ads
     implementation("com.applovin:applovin-sdk:13.2.0")
-    implementation("com.google.android.gms:play-services-ads:24.2.0")
+    implementation("com.google.android.gms:play-services-ads:24.7.0")
     implementation("com.android.installreferrer:installreferrer:2.2")
     implementation("com.intuit.sdp:sdp-android:1.1.1")
 
     // Other
     implementation("com.google.code.gson:gson:2.10.1")
     implementation("com.airbnb.android:lottie:6.6.0")
-    implementation("com.google.android.ump:user-messaging-platform:3.2.0")
+    implementation("com.google.android.ump:user-messaging-platform:4.0.0")
 
-    implementation(platform("com.google.firebase:firebase-bom:34.0.0"))
+    implementation(platform("com.google.firebase:firebase-bom:34.5.0"))
     implementation("com.google.firebase:firebase-analytics")
     implementation("com.google.firebase:firebase-crashlytics-ndk")
     implementation("com.google.firebase:firebase-config")
