@@ -3,7 +3,7 @@
 🔧 Firebase Setup (Required in App Module)
 To enable Firebase features (Analytics, Remote Config, Crashlytics...) used by this library, please follow the steps below in your app project.
 
-1️⃣ Add Firebase 
+1️⃣ build.gradle
 
 ```kotlin
 pluginManagement {
@@ -65,6 +65,7 @@ plugins {
 
 dependencies {
     .....
+    // Nếu lỗi không build được thì chủ động dùng vesion trực tiếp của từng sdk
     implementation("com.google.android.gms:play-services-ads:latest.release")
     implementation("com.google.ads.mediation:vungle:latest.release")
     implementation("com.google.ads.mediation:pangle:latest.release")
@@ -77,7 +78,7 @@ dependencies {
 }
 ```
 
-Call in app:
+Call Firebase in app:
 ```
  FireBaseConfig.initRemoteConfig(R.xml.remote_config_defaults,object : FireBaseConfig.CompleteListener{
             override fun onComplete() {
